@@ -1,0 +1,4205 @@
+swagger: '2.0'
+info:
+  description: >-
+    NZRIS Data provider API.  You can find out more about     NZRIS at TBC
+    [https://nzris.org.nz](https://www.mbie.govt.nz/info-services/science-innovation/research-and-data/nris/in-detail). 
+    <br>All URLs here would be prefixed as per the baseURL above e.g.
+    http://provider-api.nzris.org.nz/services/v1 and vary depending on test
+    environments. <br/>Major version increments will be breaking, minor not,
+    before go live it will be set to 1 in path with more detail in header.
+  version: '2.0'
+  title: NZRIS Data Provider API
+  termsOfService: 'http://nzris.org.nz/provider-api/terms/'
+  contact:
+    email: nzris@mbie.govt.nz
+basePath: /services/v2.0
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: dataprovider
+    description: Data Provider current registration
+    externalDocs:
+      description: Find out more at
+      url: 'http://nzris.org.nz/provider-api/overview/'
+  - name: submission
+    description: >-
+      Submission Bulk Operations for creating a new submission or accessing the
+      entire submission collection
+    externalDocs:
+      description: Find out more TBC
+      url: 'http://nzris.org.nz/provider-api/overview/'
+  - name: element
+    description: Operations for accessing individual elements inside a submission
+    externalDocs:
+      description: Find out more TBC
+      url: 'http://nzris.org.nz/provider-api/overview/'
+  - name: reference
+    description: Operations for accessing reference data
+    externalDocs:
+      description: Find out more TBC
+      url: 'http://nzris.org.nz/provider-api/overview/'
+  - name: suppression
+    description: Operations for accessing records suppressed due to user feedback
+    externalDocs:
+      description: Find out more TBC
+      url: 'http://nzris.org.nz/provider-api/overview/'
+schemes:
+  - https
+paths:
+  /echoString/:
+    post:
+      tags:
+        - dataprovider
+      summary: Echo to validate connectivity
+      description: >-
+        Returns an echo, if successfully connected and authorised as a API
+        consumer
+      operationId: echoString
+      produces:
+        - application/json
+      parameters:
+        - name: echoString
+          in: query
+          description: String to echo
+          required: true
+          type: string
+          default: echo123
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: string
+            example: echo123
+      security:
+        - api_key: []
+  '/dataprovider/{dataProviderId}':
+    get:
+      tags:
+        - dataprovider
+      summary: Read dataprovider configuration
+      description: >-
+        Returns the configuration for the data provider, if authorised, thereby
+        also confirming authentication filter access to dataprovider. 
+      operationId: getDataProviderById
+      produces:
+        - application/json
+      parameters:
+        - name: dataProviderId
+          in: path
+          description: ID of data provider to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/DataProvider'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Data provider not found
+      security:
+        - api_key: []
+  '/submissions/{submissionId}':
+    post:
+      tags:
+        - submission
+      summary: Create a new Submission
+      description: >-
+        Create a new data submission and its dataset, kicking off a new workflow
+        to have it reviewed and approved (or auto approved). Note that the submissionId provided is assumed to be a localSubmissionId specific to the data provider - NZRIS will generate an NZRISSubmissionId and version number which should be used to reference this submission subsequently. 
+      operationId: createSubmission
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: path
+          description: The localId of the submission being made - specific to each data provider. NZRIS will generate an NZRISSubmissionId and version number for each submission during the submission validation process. Note that subsequent create operations with the same localSubmissionId will be rejected.
+          required: true
+          type: string
+        - name: Submission
+          in: body
+          description: Submission dataset
+          required: true
+          schema:
+            $ref: '#/definitions/Submission'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Submission'
+        '400':
+          description: Invalid submissionId supplied
+        '404':
+          description: Submission not found
+      security:
+        - api_key: []
+    put:
+      tags:
+        - submission
+      summary: Update entire Submission dataset
+      description: 'Update entire Submission dataset, removing what is not mentioned'
+      operationId: updateSubmissionFull
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID of submission
+          required: true
+          type: string
+        - name: Submission
+          in: body
+          description: Submission dataset
+          required: true
+          schema:
+            $ref: '#/definitions/Submission'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Submission'
+        '400':
+          description: Invalid submissionId supplied
+        '404':
+          description: Submission not found
+      security:
+        - api_key: []
+    get:
+      tags:
+        - submission
+      summary: Read Submission metadata and elements
+      description: >-
+        Read Submission metadata and elements by submission ID. Note To see the
+        submissions for a dataprovider see
+        /dataprovider/{dataproviderID}/submissions
+      operationId: getSubmissionById
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID of submission to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Submission'
+        '400':
+          description: Invalid submissionId supplied
+        '404':
+          description: Submission not found
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - submission
+      summary: Submission abort
+      description: >-
+        Aborts the approval workflow for a data submission if the submission
+        workflow is still active. 
+        /submissions/{submissionId}/deleteall:
+      operationId: abortSubmissionById
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID of submission to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid submissionId supplied
+        '404':
+          description: Submission not found
+      security:
+        - api_key: []
+  '/submissions/{submissionId}/elementsreplace/':
+    put:
+      tags:
+        - submission
+      summary: 'Update entities in Submission dataset, merge with existing.'
+      description: >-
+        Update or add entities in Submission dataset, will not remove. Will add
+        or update as required, can be one or many elements. For individual
+        delete please use DELETE
+        /submissions/{submissionId}/element/{elementType}. For deleting all
+        removed items in bulk use PUT /submissions/{submissionId}. This
+        operation is needed as many frameworks have limited support for PATCH in
+        standard format. 
+      operationId: updateSubmissionEntityReplace
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID of existing data provider submission
+          required: true
+          type: string
+        - name: Submission
+          in: body
+          description: Submission dataset
+          required: true
+          schema:
+            $ref: '#/definitions/Submission'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Person'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Submission not found
+      security:
+        - api_key: []
+  /references/codesets/:
+    get:
+      tags:
+        - reference
+      summary: Read available codeset(s)
+      description: >-
+        Read available codesets optionally filtering for specific codeset and
+        version. In scope? 
+      operationId: getREferenceCodesetsAll
+      produces:
+        - application/json
+      parameters:
+        - name: codesetname
+          in: query
+          description: Name of codeset(s) to return
+          required: false
+          type: string
+        - name: codesetversion
+          in: query
+          description: Version of codeset(s) to return
+          required: false
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            description: Related available codesets
+            items:
+              $ref: '#/definitions/Codeset'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Data provider not found
+      security:
+        - api_key: []
+  /references/protection/:
+    get:
+      tags:
+        - reference
+      summary: Read Protection Patterns available
+      description: 'Read Protection Patterns available. In scope? '
+      operationId: getProtectionPatternsAll
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            description: All currently available Protection Patterns
+            items:
+              $ref: '#/definitions/ProtectionPattern'
+      security:
+        - api_key: []
+  '/suppressions/{dataproviderID}/':
+    get:
+      tags:
+        - suppression
+      summary: List records suppressed for data provider
+      description: List records suppressed for data provider due to user feedback
+      operationId: getDataProviderSuppressedRecords
+      produces:
+        - application/json
+      parameters:
+        - name: dataproviderID
+          in: path
+          description: ID of data provider
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            description: All currently suppressed records for data provider
+            items:
+              $ref: '#/definitions/RecordSuppression'
+      security:
+        - api_key: []
+securityDefinitions:
+  basic_auth:
+    type: basic
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+definitions:
+  DataProvider:
+    type: object
+    required:
+      - dataProviderId
+      - name
+      - status
+    properties:
+      dataProviderId:
+        type: string
+        example: MBIE
+      name:
+        type: string
+        example: 'Ministry of Business, Innovation and Employment'
+      autoApproval:
+        type: string
+        description: Whether auto-approval is setup for this data provider
+      status:
+        type: string
+        description: Data provider status
+        enum:
+          - active
+          - pending
+          - disabled
+      trustedCustodianLogins:
+        type: array
+        description: Logins granted custodian role
+        items:
+          type: string
+      trustedLogins:
+        type: array
+        description: Logins granted ability to see all dataprovider data
+        items:
+          type: string
+      trustedMachineCerts:
+        type: array
+        description: >-
+          PKCS copies of X509 certs for machines granted ability to represent
+          dataproviders
+        items:
+          type: string
+  Submission:
+    type: object
+    description: >-
+      The data that accompanies any data submission to NZRIS. Submissions may be
+      made with any number of data row/entity up to a full report for a period.
+      Submission metadata must accompany each submission. This metadata is used
+      to assess quality and coverage and then communicate it to website
+      users.      
+    required:
+      - localSubmissionId
+      - dataProviderId
+      - dateDataExtracted
+      - sourcesDataExtractedFrom
+      - dataSubmissionContacts
+      - dataStartDate
+      - dataEndDate
+      - elements
+    properties:
+      localSubmissionId:
+        type: string
+        description: >-
+          The submission ID for the submitted data. If the submission is a
+          repeat of a previous submission, reuse the ID. If it is not a repeat
+          of a previous submission, leave blank and NZRIS will provide a
+          submission ID, or provide one with the data provider ID as prefix.
+      localResubmissionId:
+        type: string
+        description: >-
+          The local submission ID for the submitted data this submission
+          will replace (deprecated do not use)
+      nzrisSubmissionId:
+        type: string
+        description: >-
+          The NZRIS submission ID - this will be generated by NZRIS.
+      dataSubmissionContacts:
+        type: string
+        description: >-
+          The person(s) who have operational responsibility for the data
+          submission.  Name field, contact details.
+        example: Joe.Bloggs@RSI.ac.nz
+        minItems: 1
+      dataStartDate:
+        type: string
+        format: date
+        description: The first date that the data covers.
+      dataEndDate:
+        type: string
+        format: date
+        description: The last date that the data covers.
+      coverageIncluded:
+        type: string
+        description: A short description of what is covered within the data.
+      coverageExcluded:
+        type: string
+        description: A short description of what is excluded from the data.
+      accuracyQuality:
+        type: string
+        description: >-
+          Examples of the accuracy or quality of the data. For example, includes
+          GST, start date and end date are calculated etc.
+        example: 'includes GST, start date and end date are calculated.'
+      standardCaveats:
+        type: array
+        description: >-
+          The standard caveats that have been applied to the data. Codeset |
+          Standard Caveats
+        items:
+          type: string
+          example: 'This submission covers only publically funded research'
+      dataSources: 
+        type: array
+        items:
+          $ref: '#/definitions/DataSource'
+        minItems: 1
+      elements:
+        $ref: '#/definitions/RSIElementCollection'
+  DataSource:
+    type: object
+    description: The sources of data in this submission
+    required:
+      - dataSource
+      - dataSourceDescription
+    properties:
+      dataSource:
+        type: string
+        description: The source(s) from which the data has been extracted
+        example: Finance Management System (FMS)
+      dataSourceDescription:
+        type: string
+        description: Description of the data source
+        example: Holds information about financial transactions for research contracts
+      dateDataExtracted:
+        type: string
+        format: date
+        description: The date the data has been extracted from the source (optional)
+        example: "2019-05-06"
+  RSIElementCollection:
+    type: object
+    description: Can contain one or more of any and all entity types simultaneously
+    properties:
+      assetPools:
+        type: array
+        items:
+          $ref: '#/definitions/AssetPool'
+      plannedDistributions:
+        type: array
+        items:
+          $ref: '#/definitions/PlannedDistribution'
+      applications:
+        type: array
+        items:
+          $ref: '#/definitions/Application'
+      applicationReviews:
+        type: array
+        items:
+          $ref: '#/definitions/ApplicationReview'
+      applicationDecisions:
+        type: array
+        items:
+          $ref: '#/definitions/ApplicationDecision'
+      awardsGranted:
+        type: array
+        items:
+          $ref: '#/definitions/AwardGranted'
+      resourcesDistributed:
+        type: array
+        items:
+          $ref: '#/definitions/ResourceDistributed'
+      projects:
+        type: array
+        items:
+          $ref: '#/definitions/Project'
+      awardsReceived:
+        type: array
+        items:
+          $ref: '#/definitions/AwardReceived'
+      resourcesReceived:
+        type: array
+        items:
+          $ref: '#/definitions/ResourceReceived'
+      outputs:
+        type: array
+        items:
+          $ref: '#/definitions/Output'
+      persons:
+        type: array
+        items:
+          $ref: '#/definitions/Person'
+      organisations:
+        type: array
+        items:
+          $ref: '#/definitions/Organisation'
+      groups:
+        type: array
+        items:
+          $ref: '#/definitions/Group'
+    minProperties: 1
+  AssetPool:
+    type: object
+    description: >-
+      As per specification 2.0, Entity section 1 and its subsections, Mandatory
+      entity type if distributing public funds. For this entity you are asked to
+      provide data relating to the asset pool’s name and resources.  You will
+      need to update this data when changes occur, such as a change in the name
+      of the asset pool, or a change in the level or source of resources in the
+      asset pool.
+    required:
+      - localAssetPoolID
+      - assetPoolName
+      - protectionrequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for this asset pool. Format: Text (max 256
+          characters)
+      establishmentDate:
+        type: string
+        description: >-
+          The date the asset pool was established. Format: date: ISO 8601
+          (yyyy.mm.dd)
+      disestablishmentDate:
+        type: string
+        description: >-
+          The date the asset pool was disestablished. Format: date: ISO 8601
+          (yyyy.mm.dd) 
+      purpose:
+        type: string
+        description: >-
+          The reason for the existence of the asset pool. Briefly explain why
+          the asset pool has been created. Format: Text: Paragraph (max 2500
+          characters)
+      assetPoolName:
+        type: array
+        description: >-
+          The name or title of the asset pool (e.g. fund or scheme). Refer to
+          1.a 
+        items:
+          $ref: '#/definitions/AssetPoolName'
+        minItems: 1
+      NZPublicSectorFinancialResource:
+        type: array
+        description: >-
+          Financial resources controlled by this asset pool provided by the
+          public sector. Mandatory if the asset pool includes public funds Refer
+          to 1.b
+        items:
+          $ref: '#/definitions/NZPublicSectorFinancialResource'
+      otherResource:
+        type: array
+        description: >-
+          All resources controlled by this asset pool provided by the private
+          sector, or the non NZ public sector. Refer to Section 1.c
+        items:
+          $ref: '#/definitions/AssetPoolOtherResource'
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+        example:
+          - pattern: '03'
+          - pattern: '04'
+  AssetPoolName:
+    type: object
+    description: >-
+      This entity seeks information about the name of the asset pool. If the
+      Asset pool has more than one name/type, please provide one record for
+      each.
+    required:
+      - assetPoolName
+      - assetPoolNameType
+    properties:
+      assetPoolName:
+        type: string
+        description: >-
+          The name used for this asset pool. Enter the name as it should be
+          displayed. Needed for presentation when selecting and viewing data.
+          Format: Text (max 512 characters)
+      assetPoolNameType:
+        type: string
+        description: >-
+          The type of name being supplied. An asset pool may have multiple
+          names, e.g. a short name for use in report data, a legal name, and a
+          Maori name. Format: Code Set | Organisation Name Type
+        example: '1'
+      assetPoolNameStartDate:
+        type: string
+        description: >-
+          The date on which this name first came into use. Enter the relevant
+          value for the Asset Pool Name Type selected in 1.a.2. Needed to enable
+          accurate representation of the name over time. Format: date: ISO 8601
+          (yyyy.mm.dd)
+      assetPoolNameEndDate:
+        type: string
+        description: >-
+          Needed to enable accurate representation of the name over time.
+          Format: date: ISO 8601 (yyyy.mm.dd)
+      assetPoolNameComment:
+        type: string
+        description: >-
+          Short additional comment. Needed to allow supplementary information to
+          be stored for reference. Format: Text (max 512 characters)
+  NZPublicSectorFinancialResource:
+    type: object
+    description: >-
+      Mandatory if the asset pool contains New Zealand Government resources This
+      entity seeks information about resources in the asset pool obtained from
+      the New Zealand Government. Please provide one record for each such
+      resource. Note: The resources controlled by an asset pool are not
+      necessarily the resources distributed by that asset pool (e.g. an asset
+      pool may control a capital fund and distribute the earnings of that fund).
+    required:
+      - appropriation
+      - appropriationPeriod
+      - vote
+      - scope
+      - amount
+      - estimateType
+      - startYear
+      - endYear
+    properties:
+      appropriation:
+        type: string
+        description: >-
+          The appropriation from which the funds are received. Needed to link
+          awards back to appropriations and therefore the effects of funding of
+          each appropriation example: 'Science and Innovation: Contestable
+          Research Fund'. Format: Code Set | Public Sector Financial Resource
+      appropriationPeriod:
+        type: string
+        description: >-
+          The period for which the appropriation is valid. Format: Code Set |
+          Public Sector Financial Resource
+        example: A
+      vote:
+        type: string
+        description: >-
+          The Vote containing the appropriation. Needed to capture the original
+          source of government funding. example: 'Business, Science and
+          Innovation'. Format: Code Set | Public Sector Financial Resource
+      scope:
+        type: string
+        description: >-
+          The legal boundary of use of the funds. Provide a short description of
+          the scope of use of the funds. Format: Code Set | Public Sector
+          Financial Resource
+      estimateType:
+        type: string
+        description: >-
+          The type of appropriation estimate. Needed to determine whether the
+          amount is final. Format: Code Set | Public Sector Financial Resource
+        example: E
+      startYear:
+        type: string
+        description: >-
+          The year in which the appropriation starts. Appropriations are granted
+          from 1 July in this year. Format: Code Set | Public Sector Financial
+          Resource
+      endYear:
+        type: string
+        description: >-
+          The year in which the appropriation ends. Appropriations end on 30
+          June in this year. Format: Code Set | Public Sector Financial Resource
+      amount:
+        type: string
+        description: >-
+          The financial value of the resource being supplied. Provide financial
+          values excluding GST
+        example: '4000000.00'
+  AssetPoolOtherResource:
+    type: object
+    description: >-
+      Mandatory if the asset pool contains resources from the private sector or
+      non-NZ public sector. This entity seeks information about the resources in
+      the asset pool that have been obtained from the private sector or the
+      non-NZ public or private sector. Please provide one record for each such
+      resource included in the asset pool. Note: The resources controlled by an
+      asset pool are not necessarily the resources distributed by that asset
+      pool (e.g. an asset pool may control a capital fund and distribute the
+      earnings of that fund).
+    required:
+      - supplierOrganisationType
+      - resourceType
+      - minimumResourceQuantity
+    properties:
+      supplierOrganisationType:
+        type: string
+        description: >-
+          The type of organisation. Needed to inform organisation demographics.
+          Format: Code Set | Organisation Type
+        example: DA01
+      supplierOrganisationIndustry:
+        type: string
+        description: >-
+          The type of industry in which the supplier organisation is active.
+          Needed to identify the industries supplying resources for RS&I
+          activity. Format: Code Set |  ANZSIC 2006 Level 2
+        example: OO2
+      supplierOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation contributing
+          resources to the asset pool. Format: Code Set | Organisation
+          Identifier Type
+        example: '2'
+      supplierOrganisationID:
+        type: string
+        description: >-
+          The identifier value for the organisation contributing resources to
+          the asset pool. Enter the relevant value, e.g. the NZBN, for the
+          Supplier Organisation ID Type selected in 1.c.3. Format: Text (max 256
+          characters)
+        example: '9429041920244'
+      fundingPersonIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person supplying the
+          resources. Needed to identify individuals supplying resources for RS&I
+          activity. Format: Code Set | Person Identifier Type
+        example: '2'
+      fundingPersonID:
+        type: string
+        description: >-
+          The identifier value for the person supplying the resources. Enter the
+          relevant value, e.g. the ORCID ID, for the Funding Person ID Type
+          selected in 1.c.5. Format: Text (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      purpose:
+        type: string
+        description: >-
+          The goal or purpose intended to be achieved as a result of use of the
+          resources. Provide a brief description of the purpose(s) for which the
+          resources may be used. Format: Text: Paragraph (max 2500 characters)
+      scope:
+        type: string
+        description: >-
+          Limitations on the allocation or use of the resources. Provide a brief
+          description of the limitations on the use of the resources. Format:
+          Text (max 512 characters)
+      resourceType:
+        type: string
+        description: 'The type of resource being supplied. Format: Code Set | Resource Type'
+        example: D1
+      minimumResourceQuantity:
+        type: string
+        description: 'The minimum quantity of the resource to be distributed. Format: Digit'
+        example: '20000.00'
+      maximumResourceQuantity:
+        type: string
+        description: >-
+          The maximum quantity of the resource to be distributed. Conditional:
+          If a fixed quantity is available, specify the quantity as the minimum
+          quantity and do not populate the maximum quantity. If the resource
+          quantity is variable, populate both the minimum and maximum quantity
+          values. Format: Digit
+        example: '40000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the resource being supplied. Conditional: Provide if
+          Resource Type selected in 1.c.9 is NZ Public Sector Financial Resource
+          (D1) or Other Financial Resource (D2). Format: Code Set | ISO 4217
+          Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the resource being supplied.  Conditional: Provide if
+          Resource Type selected in 1.c.9 is Infrastructure Resource (I1), FTE
+          Resource (I2) or Other Resource (I3). Format: Code Set | Resource
+          Measure - Non-Currency.
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied in NZ dollars at
+          the time the record is submitted. In some cases (e.g. provision of
+          facilities, allocation of FTE) a resource value can be specified. In
+          some cases (e.g. use of a restricted data set) a value may not be able
+          to be specified. If providing financial values in New Zealand Dollars
+          (NZD), exclude GST. Format: Money. Enter up to two decimal points.
+        example: '20000.00'
+      startDate:
+        type: string
+        description: >-
+          The start date of the period for which the resources are available.
+          Format: date: ISO 8601 (yyyy-mm-dd)
+      endDate:
+        type: string
+        description: >-
+          The end date of the period for which the resources are available.
+          Format: date: ISO 8601 (yyyy-mm-dd)
+  PlannedDistribution:
+    type: object
+    description: >-
+      This is an optional entity type to provide. This entity seeks information
+      about how the asset pool plans to allocate resources over a particular
+      timeframe. This may be a contestable process (with applications, reviews,
+      and decisions leading to awards) or a negotiated or on-demand process. A
+      planned distribution is any time-bound plan to distribute specified
+      resources, e.g. a funding round, or a calendar year, or some other period.
+      Any asset pool which regularly distributes resources, and plans that
+      distribution (i.e. has a specific period for applications or distribution
+      of resources) can supply the following information to NZRIS to describe
+      their process. An asset pool which negotiates awards on an irregular basis
+      may not need to supply this information or may set up a single planned
+      distribution for the expected lifespan of the asset pool.  
+    required:
+      - localAssetPoolID
+      - localDistributionID
+      - allocationMethod
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for this asset pool. Format: Text (max 256
+          characters)
+      localDistributionID:
+        type: string
+        description: >-
+          The local identifier assigned by the asset pool administrator for this
+          planned distribution of resources. Format: Text (max 256 characters)
+      distributionName:
+        type: string
+        description: >-
+          The name used to describe this planned distribution of resources (e.g.
+          MacGyver Fund 2016-18 Round) Format: Text (max 512 characters)
+        example: MacGyver Fund 2016-18 Round
+      allocationMethod:
+        type: string
+        description: >-
+          The method which will be used to allocate resources. Format: Code Set
+          | Allocation Method
+        example: C
+      expectedAwardDeterminationDate:
+        type: string
+        description: >-
+          The date by which the allocation award decisions are expected to have
+          been made. A planned distribution which is allocated on demand or by
+          negotiation may not have an expected award determination date. Format:
+          date: ISO 8601 (yyyy-mm-dd)
+      distributionPeriod:
+        type: array
+        description: The periods of planned activity. Refer to Section 2.a
+        items:
+          $ref: '#/definitions/PlannedDistributionPeriod'
+      resourcesToDistribute:
+        type: array
+        description: >-
+          The resources which will be available for distribution. Refer to
+          Section 2.b
+        items:
+          $ref: '#/definitions/PlannedDistributionResource'
+      constraints:
+        type: array
+        description: >-
+          Constraints applicable to distribution of resources. Refer to Section
+          2.c
+        items:
+          $ref: '#/definitions/PlannedDistributionConstraints'
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  PlannedDistributionPeriod:
+    type: object
+    description: >-
+      This entity seeks information about the timing of the activities required
+      to distribute resources for the asset pool (for example, call for
+      applications, review, and notification of award). Please provide a record
+      for each relevant activity. 
+    required:
+      - periodType
+      - periodStartDate
+      - periodEndDate
+    properties:
+      periodType:
+        type: string
+        description: >-
+          The type of activity being undertaken in the period. Needed to
+          understand the activity being undertaken in the period. Format: Code
+          Set | Distribution Period Type
+        example: CA
+      periodStartDate:
+        type: string
+        description: 'The first date in the period. Format: date: ISO 8601 (yyyy-mm-dd)'
+      periodEndDate:
+        type: string
+        description: 'The last date in the period. Format: date: ISO 8601 (yyyy-mm-dd)'
+      periodComment:
+        type: string
+        description: 'Brief additional comment. Format: Text (max 512 characters)'
+  PlannedDistributionResource:
+    type: object
+    description: >-
+      This entity seeks information about the resources the asset pool has to
+      distribute. Please provide a record for each such resource.  Note: it is
+      possible that not all resources will be allocated.
+    required:
+      - resourceType
+      - minimumResourceQuantity
+    properties:
+      resourceType:
+        type: string
+        description: >-
+          The type of resource to be distributed. Format: Code Set | Resource
+          Type
+        example: D1
+      minimumResourceQuantity:
+        type: string
+        description: 'The minimum quantity of the resource to be distributed. Format: Digit'
+        example: '2000000.00'
+      maximumResourceQuantity:
+        type: string
+        description: >-
+          The maximum quantity of the resource to be distributed. Conditional:
+          If a fixed quantity is available specify the quantity as the minimum
+          quantity and do not populate the maximum quantity.  If the resource
+          quantity is variable, populate both the minimum and maximum quantity
+          values. Format: Digit
+        example: '4000000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the resource to be distributed. Conditional: Provide if
+          Resource Type selected in 2.b.1 is NZ Public Sector Financial Resource
+          (D1) or Other Financial Resource (D2). Format: Code Set | ISO 4217
+          Currency Codes.
+        example: NZD
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the resource to be distributed.  Conditional: Provide
+          if Resource Type selected in 2.b.1 is Infrastructure Resource (I1),
+          FTE Resource (I2) or Other Resource (I3). Format: Code Set | Resource
+          Measure - Non-Currency.
+        example: '10'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied in NZ dollars at
+          the time the record is submitted. In some cases (e.g. provision of
+          facilities, allocation of FTE) a resource value can be specified. In
+          some cases (e.g. use of a restricted data set) a value may not be able
+          to be specified. If providing financial values in New Zealand Dollars
+          (NZD), exclude GST. Format: Money (Enter up to two decimal points)
+        example: '20000.00'
+  PlannedDistributionConstraints:
+    type: object
+    description: >-
+      This entity seeks information about the constraints on the use of
+      resources distributed by the asset pool (for example, match funding
+      required, actual costs only). Please provide a record for each such
+      constraint.
+    required:
+      - constraintType
+      - constraint
+    properties:
+      constraintType:
+        type: string
+        description: >-
+          The type of constraint applicable to awards made via this distribution
+          of resources. Format: Code Set | Constraint Type
+        example: '1'
+      constraint:
+        type: string
+        description: >-
+          The specific constraint on this distribution of resources. A brief
+          description of the constraint (e.g. No more than 10% of award to be
+          used for capital costs). Format: Text (max 512 characters)
+        example: No more than 10% of award to be used for capital costs
+      constraintAdditionalInformation:
+        type: string
+        description: >-
+          Supplementary information. Additional information that may be of use
+          to data users. Format: Text (max 512 characters)
+  Application:
+    type: object
+    description: >-
+      See specification v2.0, Entity Section 3 and its subsections. This entity
+      is optional. This entity seeks information about requests for resources
+      from an asset pool, including who made the application, what kind of
+      resources were requested, why they were requested, the people involved in
+      the proposed work, and metadata about the proposal.
+    required:
+      - localAssetPoolID
+      - localApplicationID
+      - applicationType
+      - applicationPhase
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for this asset pool. Format: Text (max 256
+          characters)
+      localDistributionID:
+        type: string
+        description: >-
+          The local identifier for the planned distribution of resources. If the
+          application is for a planned distribution of resources, the Local
+          Distribution ID should be supplied. Format: Text (max 256 characters)
+      localApplicationID:
+        type: string
+        description: >-
+          The local identifier for the request for resources. This identifier is
+          generated by the data provider. Format: Text (max 256 characters)
+      priorLocalApplicationID:
+        type: string
+        description: >-
+          The local identifier for a prior application. Conditional: If multiple
+          applications are submitted, identify the prior application (e.g. a
+          prior version of the current application, or an application from an
+          earlier stage in the allocation process). Format: Text (max 256
+          characters)
+      applicationType:
+        type: string
+        description: >-
+          Whether this application is an individual or organisational
+          application for resources. Format: Code Set | Application Type
+        example: I
+      applicationPhase:
+        type: string
+        description: 'The stage of the application. Format: Code Set | Application Phase'
+        example: S1
+      proposalTitle:
+        type: string
+        description: >-
+          The title of the proposal e.g. New model of sea temperatures. Format:
+          Text (max 512 characters)
+        example: New model of sea temperatures
+      outcomeGoal:
+        type: string
+        description: >-
+          The outcome goal delivering the proposed outputs will support
+          achieving. Format: Text (max 512 characters)
+      applicantPersonIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the applicant (individual
+          application only) Conditional: Provide if Application Type selected in
+          3.5 is Individual (I). Format: Code Set | Person Identifier Type
+        example: '2'
+      applicantPersonID:
+        type: string
+        description: >-
+          The identifier value for the applicant (individual application only).
+          Enter the relevant value, e.g. the ORCID ID, for the Applicant Person
+          ID Type selected in 3.9. Conditional: Provide if Application Type
+          selected in 3.5 is Individual (I). Format: Text (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      applicantOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the applicant organisation
+          (organisational application only). Type Conditional: Provide if
+          Application Type selected in 3.5 is Organisation (O) or
+          Multi-Organisation (M). Format: Code Set | Organisation Identifier
+        example: '2'
+      applicantOrganisationID:
+        type: string
+        description: >-
+          The identifier value for the applicant organisation. (organisational
+          application only). Enter the relevant value, e.g. the NZBN, for the
+          Applicant Organisation ID Type selected in 3.11. Conditional: Provide
+          if Application Type selected in 3.5 is Organisation (O) or
+          Multi-Organisation (M). Format: Text (max 256 characters)
+        example: '9429041920244'
+      submittingOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation submitting
+          the application (when one organisation submits an application on the
+          organisation or person requesting resources). Conditional: Required if
+          an organisation submits an application on behalf of a person or
+          another organisation. Format: Code Set | Organisation Identifier Type
+        example: '2'
+      submittingOrganisationIDValue:
+        type: string
+        description: >-
+          The identifier value for the organisation submitting the application.
+          Enter the relevant value, e.g. the NZBN, for the Submitting
+          Organisation ID Type selected in 3.13. Conditional: Required if an
+          organisation submits an application on behalf of a person or another
+          organisation. Format: Text (max 256 characters)
+        example: '9429041920244'
+      affiliatedOrganisationGroupID:
+        type: string
+        description: >-
+          The identifier for a group of organisations involved in the
+          application (e.g. consortia, research partnership). Format: Text (max
+          256 characters)
+      proposedPersonnel:
+        type: array
+        description: >-
+          The identifiers for the proposed personnel specified in the
+          application. Refer to Section 3.a
+        items:
+          $ref: '#/definitions/ApplicationProposedPersonnel'
+        example:
+          - personIdentifierType: '2'
+            personIdentifierValue: 'https://orcid.org/0000-0001-1111-1111'
+            role: R1
+          - personIdentifierType: '1'
+            personIdentifierValue: '423356463'
+            role: R2
+      requestedResource:
+        type: array
+        description: The resources requested in the application. Refer to Section 3.b
+        items:
+          $ref: '#/definitions/ApplicationRequestedResource'
+      proposal:
+        type: array
+        description: The proposal(s) associated with. Refer to Section 3.c
+        items:
+          $ref: '#/definitions/ApplicationProposal'
+      ANZSRCTypeofActivityDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Activity code. Refer to
+          Section 3.d
+        items:
+          $ref: '#/definitions/ANZSRCTypeOfActivityDistribution'
+        minItems: 0
+        maxItems: 5
+        example:
+          - ANZSRCTypeOfActivity: '1'
+            shareOfANZSRCTypeOfActivity: '0.9'
+          - ANZSRCTypeOfActivity: '2'
+            shareOfANZSRCTypeOfActivity: '0.1'
+      ANZSRCFieldofResearchDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Field of Research. Refer to
+          Section 3.e
+        items:
+          $ref: '#/definitions/ANZSRCFieldOfResearchDistribution'
+        minItems: 0
+        maxItems: 6
+        example:
+          - ANZSRCFieldOfResearch: '110309'
+            shareOfANZSRCFieldOfResearch: '0.8'
+          - ANZSRCFieldOfResearch: '110310'
+            shareOfANZSRCFieldOfResearch: '0.2'
+      ANZSRCSocioeconomicObjectiveDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Socioeconomic Objective. Refer
+          to Section 3.f
+        items:
+          $ref: '#/definitions/ANZSRCSocioEconomicObjective'
+        minItems: 0
+        maxItems: 5
+        example:
+          - ANZSRCSocioEconomicObjective: '920304'
+            shareOfANZSRCSocioEconomicObjective: '0.6'
+          - ANZSRCSocioEconomicObjective: '920305'
+            shareOfANZSRCSocioEconomicObjective: '0.2'
+          - ANZSRCSocioEconomicObjective: '920306'
+            shareOfANZSRCSocioEconomicObjective: '0.2'
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+        example:
+          - pattern: '03'
+            datePatternExpires: '2023-02-01'
+          - pattern: '04'
+            datePatternExpires: '2023-02-01'
+  ApplicationProposedPersonnel:
+    type: object
+    description: >-
+      This entity seeks information about the people proposed for projects that
+      receive resources from the asset pool. Please provide a record for each
+      proposed person.
+    required:
+      - personIDType
+      - personID
+      - role
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person. Format: Code Set |
+          Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the person. Enter the relevant value, e.g.
+          the ORCID ID, for the Person ID Type selected in 3.a.1. Format: Text
+          (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      role:
+        type: string
+        description: >-
+          The role the person performs. If more than one person is proposed,
+          ensure the Lead Contributor is identified. Format: Code Set |
+          Personnel Role
+        example: R1
+  ApplicationRequestedResource:
+    type: object
+    description: >-
+      This entity seeks information about the resources requested in
+      applications to the asset pool and the planned period of use. Please
+      provide a record for each resource requested.
+    required:
+      - resourceType
+      - minimumResourceQuantity
+    properties:
+      resourceType:
+        type: string
+        description: >-
+          The type of resource to be distributed. Format: Code Set | Resource
+          Type
+        example: D1
+      minimumResourceQuantity:
+        type: string
+        description: 'The minimum quantity of the resource to be distributed. Format: Digit'
+        example: '200000.00'
+      maximumResourceQuantity:
+        type: string
+        description: >-
+          The maximum quantity of the resource to be distributed. Conditional:
+          If a fixed quantity is available specify the quantity as the minimum
+          quantity and do not populate the maximum quantity. If the resource
+          quantity is variable, populate both the minimum and maximum quantity
+          values. Format: Digit
+        example: '400000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 3.b.1 is NZ Public Sector
+          Financial Resource (D1) or Other Financial Resource (D2). Format: Code
+          Set | ISO 4217 Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the non-currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 3.b.1 is Infrastructure Resource
+          (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
+          Resource Measure - Non-Currency 
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied. If providing
+          financial values in New Zealand Dollars (NZD), exclude GST. Format:
+          Money (Enter up to two decimal points)
+        example: '200000.00'
+      startDate:
+        type: string
+        format: date
+        description: >-
+          The anticipated start of the period of use of the resources. Format:
+          Date: ISO 8601 yyyy-mm-dd)
+      endDate:
+        type: string
+        format: date
+        description: >-
+          The anticipated end of the period of use of the resources. Format:
+          Date: ISO 8601 yyyy-mm-dd)
+  ApplicationProposal:
+    type: object
+    description: >-
+      This entity seeks information about proposals for funding from the asset
+      pool, when there are multiple proposals within the same application.
+      Please provide a record for each proposal.
+    properties:
+      localProposalID:
+        type: string
+        description: >-
+          The local identifier for the proposal associated with the application
+          (if relevant). If the application includes an independent proposal,
+          enter the local identifier for the proposal. Format: Text (max 256
+          characters)
+      proposalTitle:
+        type: string
+        description: >-
+          The title of the proposal e.g. New model of sea temperatures. Format:
+          Text (max 512 characters)
+        example: New model of sea temperatures
+  ANZSRCTypeOfActivityDistribution:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Type of Activity (ToA)
+      relevant to the project and the proportion of focus within the project for
+      each ToA. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+    required:
+      - ANZSRCTypeOfActivity
+      - shareOfANZSRCTypeOfActivity
+    properties:
+      ANZSRCTypeOfActivity:
+        type: string
+        description: >-
+          The Type of Activity according to the ANZSRC over the life of the
+          project. Enter the NZSRC ToA classification that best reflects the
+          overall intention or focus of the project at its outset.  Most
+          applications will fall under one Type of Activity, but some may fall
+          under more than one Type of Activity.
+            Needed to understand the level of resources devoted to the different Types of Activity. These are important when designing policy and investment parameters. Format: Code Set | ANZSRC ToA
+        example: '1'
+      shareOfANZSRCTypeOfActivity:
+        type: string
+        description: >-
+          Estimate of the proportion of each Type of Activity code within each
+          project. The total of all shares of Type of Activity for a project
+          must equal 100%. Needed to derive the level of resources devoted to
+          the different Types of Activity. Format: Numeric: Percentage (Example:
+          0.20 for 20%)
+        example: '0.5'
+  ANZSRCFieldOfResearchDistribution:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Fields of Research (FoR)
+      relevant to the project and the proportion of focus within the project for
+      each FoR. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+      Research.
+    required:
+      - ANZSRCFieldOfResearch
+      - shareOfANZSRCFieldOfResearch
+    properties:
+      ANZSRCFieldOfResearch:
+        type: string
+        description: >-
+          The field of research according to the ANZSRC over the life of the
+          project (6 digit). Enter the 6 digit ANZSRC FoR classification that
+          best reflects the overall intention or focus of the project at its
+          outset. Needed to capture the scope and reach of the project according
+          to the 6 digit FoR classification. Input measures by FoR are needed to
+          understand the balance of investments by field of research, identify
+          collaboration opportunities, and to link inputs and outputs by fields
+          of research. Format: Code Set | ANZSRC FoR
+        example: '060101'
+      shareOfANZSRCFieldOfResearch:
+        type: string
+        description: >-
+          Estimate of the proportion of each Field of Research code within each
+          project. The total of all shares of FoR for a project must equal 100%.
+          Needed to derive the level of resources devoted to the different
+          Fields of Research. Format: Numeric: Percentage (Example: 0.20 for
+          20%)
+        example: '0.5'
+  ANZSRCSocioEconomicObjective:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Socio-Economic Objective (SEO)
+      relevant to the project and the proportion of focus within the project for
+      each SEO. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+    required:
+      - ANZSRCSocioEconomicObjective
+      - shareOfANZSRCSocioEconomicObjective
+    properties:
+      ANZSRCSocioEconomicObjective:
+        type: string
+        description: >-
+          The socio-economic objective of the project according to the ANZSRC
+          over the life of the projectEnter the 6 digit ANZSRC Socio-Economic
+          classification that best reflects the overall intention or focus of
+          the project at its outset. Needed to capture the scope and reach of
+          the project according to the 6 digit SEO classification. Input data by
+          SEO is needed to demonstrate effort in particular areas. SEO
+          classifications can provide an indication of expected end users.
+          Format: Code Set | ANZSRC SEO
+        example: '820101'
+      shareOfANZSRCSocioEconomicObjective:
+        type: string
+        description: >-
+          Estimate of the proportion of each Socio-Economic Objective code
+          within each project. The total of all shares of Socio-Economic
+          Objective for a project must equal 100%. Needed to derive the level of
+          resources devoted to the different Socio-Economic objectives. Format:
+          Numeric: Percentage (Example: 0.20 for 20%)
+        example: '0.5'
+  ApplicationReview:
+    type: object
+    description: >-
+      The application review entity seeks information about the people involved
+      in reviewing applications for resources and the outcomes of reviews. 
+    required:
+      - localApplicationID
+      - localReviewID
+      - reviewDate
+      - reviewMethod
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format
+          Numeric 3 digit
+      dataOwnerID:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format
+          Numeric 3 digit
+      localApplicationID:
+        type: string
+        description: >-
+          The local identifier for the application. Format Text (max 256
+          characters)
+      localReviewID:
+        type: string
+        description: >-
+          The local identifier for a prior review of this application. Format
+          Text (max 256 characters) data linking
+      assignmentDate:
+        type: string
+        format: date
+        description: >-
+          The date the review was assigned to the reviewer. Format: Date: ISO
+          8601 (yyyy-mm-dd)
+      reviewDate:
+        type: string
+        format: date
+        description: >-
+          The date the review output(s) were recorded. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      priorLocalReviewID:
+        type: string
+        description: >-
+          The local identifier for a prior review of this application. Format:
+          Text (max 256 characters)
+      reviewMethod:
+        type: string
+        description: >-
+          The method used to review the application. Format: Code Set | Review
+          Method
+        example: '1'
+      reviewScore:
+        type: string
+        description: >-
+          The overall review score (e.g. aggregated score of the group of
+          reviewers). Format: Digit
+        example: '3'
+      reviewScoreMinimum:
+        type: string
+        description: >-
+          The minimum possible score for a review. Conditional: Must be supplied
+          if a score is supplied. Needed to enable interpretation of the review
+          score. Format: Digit
+        example: '1'
+      reviewScoreMaximum:
+        type: string
+        description: >-
+          The maximum possible score for a review. Conditional: Must be supplied
+          if a score is supplied. Needed to enable interpretation of the review
+          score Format: Digit
+        example: '5'
+      reviewOutcome:
+        type: string
+        description: >-
+          The recommended outcome of the review. Format: Code Set | Review
+          Outcome
+        example: '1'
+      reviewLocalGroupID:
+        type: string
+        description: >-
+          The identifier value for the review group. Format: Text (max 256
+          characters)
+      hostOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation managing
+          and/or hosting the review process. Format: Code Set | Organisation
+          Identifier Type
+        example: '2'
+      hostOrganisationID:
+        type: string
+        description: >-
+          The identifier value for this organisation. Enter the relevant value,
+          e.g. the NZBN, for the Host Organisation ID Type selected in 4.12.
+          Needed to identify the host organisation for the review. Format: Text
+          (max 256 characters)
+        example: '9429041920244'
+      reviewers:
+        type: array
+        description: The individual reviewers and their review output. Refer to Section 4.a
+        items:
+          $ref: '#/definitions/ApplicationReviewReviewers'
+        minItems: 1
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  ApplicationReviewReviewers:
+    type: object
+    description: >-
+      This entity seeks information about the people who review applications for
+      resources from the asset pool. Please provide one record for each
+      reviewer.
+    required:
+      - personIdentifierType
+      - personIdentifierValue
+      - leadReviewerFlag
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the reviewer. Format: Code Set
+          | Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the reviewer. Enter the relevant value, e.g.
+          the ORCID ID, for the Person ID Type selected in 4.a.1. Format: Text
+          (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      leadReviewerFlag:
+        type: string
+        description: >-
+          Whether this person is the lead reviewer for this application. Format:
+          Text: Boolean (Yes/No)
+        example: 'Y'
+      reviewScore:
+        type: string
+        description: 'The individual review score. Format: Digit'
+        example: '3'
+      reviewScoreMinimum:
+        type: string
+        description: >-
+          The minimum possible score for a review. Conditional: Must be supplied
+          if a Review Score is supplied in 4.a.4. Needed to enable
+          interpretation of the review score. Format: Digit
+        example: '1'
+      reviewScoreMaximum:
+        type: string
+        description: >-
+          The maximum possible score for a review. Conditional: Must be supplied
+          if a Review Score is supplied in 4.a.4. Needed to enable
+          interpretation of the review score. Format: Digit
+        example: '5'
+  ApplicationDecision:
+    type: object
+    description: >-
+      As per specification 2.0 section 5 and its subsections. Optional entity
+      type. The application decision entity requests information about decisions
+      made about applications, and who is involved in making the decision.
+    required:
+      - localApplicationID
+      - localDecisionID
+      - decisionDate
+      - decision
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format
+          Numeric 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format
+          Numeric 3 digit
+      localApplicationID:
+        type: string
+        description: >-
+          The local identifier for the application record. Format Text (max 256
+          characters)
+      localDecisionID:
+        type: string
+        description: >-
+          The local identifier for the decision record. Format Text (max 256
+          characters)
+      priorLocalDecisionID:
+        type: string
+        description: >-
+          The local identifier for a prior review of this application. If a
+          decision is reviewed, the prior application decision may be
+          identified  (e.g. if the decision was Not eligible, but new
+          information has been supplied and a new decision has been made).
+          Format Text (max 256 characters)
+      decisionDate:
+        type: string
+        description: >-
+          The date the review output(s) were recorded. Format Date ISO 8601
+          (yyyy-mm-dd)
+      decision:
+        type: string
+        description: >-
+          The decision made about the application. Format Code Set | Application
+          Decision
+        example: '1'
+      additionalInformation:
+        type: string
+        description: >-
+          Supplementary information. Additional information that may be of use
+          to data users. Format Text (max 512 characters)
+      decisionLocalGroupID:
+        type: string
+        description: >-
+          The identifier value for the review group. Format Text (max 256
+          characters)
+      decisionMakers:
+        type: array
+        description: The individual decision makers within the group. Refer to Section 5.a
+        items:
+          $ref: '#/definitions/ApplicationDecisionDecisionMakers'
+        minItems: 1
+      protectionRequirements:
+        type: array
+        description: '''Protection Patterns required, mandatory to supply with record'''
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  ApplicationDecisionDecisionMakers:
+    type: object
+    description: >-
+      This entity seeks information about the people who make decisions about
+      applications and their roles. Please provide one record for each
+      decision-maker.
+    required:
+      - personIdentifierType
+      - personIdentifierValue
+      - leadDecisionMakerFlag
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the decision maker. Format:
+          Code Set | Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the decision maker. Enter the relevant value,
+          e.g. the ORCID ID, for the Person ID Type selected in 5.a.1. Format:
+          Text (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      leadDecisionMakerFlag:
+        type: string
+        description: >-
+          Whether this person is the lead decision maker for this application.
+          Format: Text: Boolean (Yes/No)
+        example: 'Yes'
+  AwardGranted:
+    type: object
+    description: >-
+      As per specification 2.0 section 6 and its subsections. Mandatory entity
+      type  if distributing public funds. The award granted entity seeks
+      information about resources granted through an award by an asset pool to
+      an applicant or another asset pool.
+    required:
+      - localAssetPoolID
+      - localAwardID
+      - awardTitle
+      - awardDescription
+      - awardStartDate
+      - awardEndDate
+      - awardStatus
+      - awardType
+      - awardOrganisation
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format
+          Numeric 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for this asset pool. Format Text (max 256
+          characters)
+      localDistributionID:
+        type: string
+        description: >-
+          The local identifier for this planned distribution of resources.
+          Format Text (max 256 characters)
+      localApplicationID:
+        type: string
+        description: >-
+          The local identifier for the application. If an award has been
+          allocated without an application (e.g. uncontested sub-contract) no
+          application ID is required. Format Text (max 256 characters)
+      localAwardID:
+        type: string
+        description: The local identifier for this award. Format Text (max 256 characters)
+      parentLocalAwardID:
+        type: string
+        description: >-
+          The local identifier for the parent award of this award. If an award
+          is a sub-contract, the parent Award ID should be supplied. Format Text
+          (max 256 characters)
+      localContractID:
+        type: string
+        description: >-
+          The unique identifier for the contract for this award. If a contractis
+          issued for this Award, the Contract ID should be supplied. Format Text
+          (max 256 characters)
+      parentLocalContractID:
+        type: string
+        description: >-
+          The local identifier for the parent contract of this contract. If an
+          award is a sub-contract, the parent Contract ID should be supplied.
+          Format Text (max 256 characters)
+      awardTitle:
+        type: string
+        description: >-
+          The short headline description of this award. This should be as stated
+          in the contract. Needed to communicate the nature of the award. Format
+          Text (max 512 characters) Example Endeavour Fund Asset Pool award to
+          Research Programmes Asset Pool
+      awardDescription:
+        type: string
+        description: >-
+          The brief description of the award that is understandable by an
+          informed but non-specialist reader (e.g. a public statement). This may
+          be the description of the expected outcomes of the award or, in the
+          case of an award funding a single project, the project's description.
+          Needed to understand what the award is about, what the award seeks to
+          achieve, and enable search functionality. Format Text Paragraph (max
+          2500 characters)
+      awardStartDate:
+        type: string
+        format: date
+        description: |-
+          Start date as indicated in award agreement or most recent variation.
+            Needed to understand when financial contributions to the system are
+            made. Format Date ISO 8601 (yyyy-mm-dd)
+      awardEndDate:
+        type: string
+        format: date
+        description: >-
+          End date as indicated in award agreement or most recent variation.
+          Needed to understand when financial contributions to the system are
+          made. Format Date ISO 8601 (yyyy-mm-dd)
+      awardStatus:
+        type: string
+        description: >-
+          The status of the award. Needed to identify when awards are actively
+          being utilised. Format Code Set | Status example: '1'
+      awardType:
+        type: string
+        description: >-
+          Whether this award has been made to an individual, organisation, or
+          asset pool. Needed to identify whether resources are being devolved r
+          allocated to proposed projects. Format Code Set | Award Type example:
+          I
+      assetPoolRecipientIDType:
+        type: string
+        description: >-
+          The type of identifier used for the recipient asset pool. Conditional
+          Provide if Award Type selected in 6.13 is Asset Pool (A). This must be
+          supplied if the award is devolving resources from one asset pool to
+          another. Format Text (max 256 characters). Enter either 'Local ID' or
+          'NZRIS ID'
+        example: '1'
+      assetPoolRecipientID:
+        type: string
+        description: >-
+          The identifier value for the recipient asset pool. Enter the relevant
+          ID number for the Asset Pool Recipient ID Type selected in 6.14.
+          Format Text (max 256 characters)
+      individualRecipientIDType:
+        type: string
+        description: >-
+          The type of identifier used for the individual recipient. Conditional
+          Provide if Award Type selected in element 6.13 is Individual (I).
+          Format Code Set | Person Identifier Type
+        example: '1'
+      individualRecipientID:
+        type: string
+        description: >-
+          The identifier value for the recipient individual. Enter the relevant
+          value, e.g. the ORCID ID, for the Individual Recipient ID Type
+          selected in 6.16. Format Text (max 256 characters)
+      awardOrganisation:
+        type: array
+        description: >-
+          The identifiers and roles for the organisations party to the award.
+          Refer to Section 6.a
+        items:
+          $ref: '#/definitions/AwardGrantedAwardOrganisation'
+        minItems: 1
+      agreedPersonnel:
+        type: array
+        description: >-
+          The identifiers for the agreed personnel specified in the award. Refer
+          to Section 6.b
+        items:
+          $ref: '#/definitions/AwardGrantedAgreedPersonnel'
+      allocatedResource:
+        type: array
+        description: The allocated resources specified in the award. Refer to Section 6.c
+        items:
+          $ref: '#/definitions/AwardResource'
+      ANZSRCTypeofActivityDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Activity code. Refer to
+          Section 6.d
+        items:
+          $ref: '#/definitions/AG_ANZSRCTypeofActivityDistribution'
+        minItems: 0
+        maxItems: 5
+      ANZSRCFieldofResearchDistribution:
+        type: array
+        description: |-
+          The distribution of resources by ANZSRC Field of Research. Refer to
+           Section 6.e
+        items:
+          $ref: '#/definitions/AG_ANZSRCFieldofResearchDistribution'
+        minItems: 0
+        maxItems: 6
+      ANZSRCSocioeconomicObjectiveDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Socioeconomic Objective. Refer
+          to Section 6.f
+        items:
+          $ref: '#/definitions/AG_ANZSRCSocioeconomicObjectiveDistribution'
+        minItems: 0
+        maxItems: 5
+      publicSectorResearchAlignment:
+        type: array
+        description: >-
+          Project alignment with public sector research themes. Refer to Section
+          6.g
+        items:
+          $ref: '#/definitions/PublicSectorResearchAlignment'
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  AwardGrantedAwardOrganisation:
+    type: object
+    description: >-
+      This entity seeks information about the organisations involved in making
+      awards and their roles. Please provide one record for each organisation
+      involved, including the organisation who granted the award and the
+      organisation who received the award. Conditional: Provide a record for the
+      recipient organisation if Award Type entered for element 6.13 is
+      Organisation (O) or Multi-Organisation (M).
+    required:
+      - organisationIDType
+      - organisationID
+      - organisationRole
+    properties:
+      organisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this organisation. Format:
+          Code Set | Organisation Identifier Type
+        example: '2'
+      organisationID:
+        type: string
+        description: >-
+          The identifier value for this organisation. Enter the relevant value,
+          e.g. the NZBN, for the Organisation ID Type selected in 6.a.1. Needed
+          to identify the different organisations involved in the award, and
+          their role. Format: Text (max 256 characters)
+        example: '9429041920244'
+      organisationRole:
+        type: string
+        description: >-
+          The role of the organisation in relation to the award. Format: Code
+          Set | Organisation Project Role
+        example: '1'
+  AwardGrantedAgreedPersonnel:
+    type: object
+    description: >-
+      This entity seeks information about the people assigned to the project and
+      their roles. Please provide one record for each such person.
+    required:
+      - personIDType
+      - personID
+      - role
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person. Format: Code Set |
+          Person Identifier Type
+        example: '2'
+      personIDValue:
+        type: string
+        description: >-
+          The identifier value for the person. Enter the relevant value, e.g.
+          the ORCID ID, for the Person ID Type selected in 6.b.1. Format: Text
+          (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      role:
+        type: string
+        description: >-
+          The role the person will fill. Format: Code Set | Personnel (Project)
+          Role
+        example: R1
+      localRoleDescription:
+        type: string
+        description: >-
+          The position title for this person on this project. Needed to provide
+          information for approved research and ongoing code set analysis.
+          Format: Text (max 512 characters)
+        example: Lead Researcher
+  AwardResource:
+    type: object
+    description: >-
+      This entity seeks information about the resources allocated to the
+      project. Please provide one record for each allocated resource.
+    required:
+      - localResourceID
+      - resourceType
+      - minimumResourceQuantity
+      - startDate
+      - endDate
+    properties:
+      localResourceID:
+        type: string
+        description: >-
+          The local identifier for this resource. Format: Text (max 256
+          characters)
+      resourceType:
+        type: string
+        description: >-
+          The type of resource to be distributed. Format: Code Set | Resource
+          Type
+        example: D1
+      minimumResourceQuantity:
+        type: string
+        description: 'The minimum quantity of the resource to be distributed. Format: Digit'
+      maximumResourceQuantity:
+        type: string
+        description: >-
+          The maximum quantity of the resource to be distributed. Conditional:
+          If a fixed quantity is available specify the quantity as the minimum
+          quantity and do not populate the maximum quantity. If the resource
+          quantity is variable, populate both the minimum and maximum quantity
+          values. Format: Digit
+        example: '400000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 6.c.2 is NZ Public Sector
+          Financial Resource (D1) or Other Financial Resource (D2). Format: Code
+          Set | ISO 4217 Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the non-currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 6.c.2 is Infrastructure Resource
+          (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
+          Resource Measure - Non-Currency
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied. In some cases
+          (e.g. provision of facilities, allocation of FTE) a resource value can
+          be estimated. In some cases (e.g. use of a restricted data set) a
+          value may not be able to be specified. If providing financial values
+          in New Zealand Dollars (NZD), exclude GST. Format: Money (enter up to
+          two decimal points)
+        example: '200000.00'
+      startDate:
+        type: string
+        format: date
+        description: >-
+          The agreed start of the period of use of the resources. Format: Date:
+          ISO 8601 (yyyy-mm-dd)
+      endDate:
+        type: string
+        format: date
+        description: >-
+          The agreed end of the period of use of the resources. Format: Date:
+          ISO 8601 (yyyy-mm-dd)
+      constraints:
+        type: array
+        description: Constraint(s) on use of resources. Refer to Section 6.c.a.
+        items:
+          $ref: '#/definitions/AwardResourceConstraint'
+        example:
+          - constraintType: '01'
+            resourceConstraint: Requires for 50% matching awards from other organisations
+          - constraintType: '03'
+            resourceConstraint: Maximum 10% administrative utilisation
+          - constraintType: '04'
+            resourceConstraint: No capital purchases
+          - constraintType: '99'
+            resourceConstraint: Requirement for open data access
+  AwardResourceConstraint:
+    type: object
+    description: >-
+      This entity seeks information about the constraints on resources allocated
+      to the project. Please provide one record for each constraint.
+    required:
+      - constraintType
+      - resourceConstraint
+    properties:
+      constraintType:
+        type: string
+        description: >-
+          The type of constraint applied to the resource. Format: Code Set |
+          Constraint Type
+        example: '1'
+      resourceConstraint:
+        type: string
+        description: >-
+          A description of the constraint. For example, capital vs operational
+          expenditure, maximum administrative utilisation, requirements for
+          matching awards from other organisations, data access. Format: Text
+          (max 512 characters)
+        example: Requirement for 50% matching awards from other organisations
+  AG_ANZSRCTypeofActivityDistribution:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Type of Activity (ToA)
+      relevant to the project and the proportion of focus within the project for
+      each ToA. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+    required:
+      - ANZSRCTypeOfActivity
+      - shareOfANZSRCTypeOfActivity
+    properties:
+      ANZSRCTypeOfActivity:
+        type: string
+        description: >-
+          The Type of Activity according to the ANZSRC over the life of the
+          project. Enter the ANZSRC ToA classification that best reflects the
+          overall intention or focus of the project at its outset. Most
+          applications will fall under one Type of Activity, but some may fall
+          under more than one Type of Activity. Needed to understand the level
+          of resources devoted to the different Types of Activity. These are
+          important when designing policy and investment parameters. Format:
+          Code Set | ANZSRC ToA
+        example: '1'
+      shareOfANZSRCTypeOfActivity:
+        type: string
+        description: >-
+          Estimate of the proportion of each Type of Activity code within each
+          project. The total of all shares of Type of Activity for a project
+          must equal 100%. Needed to derive the level of resources devoted to
+          the different Types of Activity. Format: Numeric: Percentage (Example:
+          0.20 for 20%)
+        example: '0.5'
+  AG_ANZSRCFieldofResearchDistribution:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Fields of Research (FoR)
+      relevant to the project and the proportion of focus within the project for
+      each FoR. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+    required:
+      - ANZSRCFieldOfResearch
+      - shareOfANZSRCFieldOfResearch
+    properties:
+      ANZSRCFieldOfResearch:
+        type: string
+        description: >-
+          The field of research according to the ANZSRC over the life of the
+          project (6 digit). This entity seeks information on the ANZSRC Fields
+          of Research (FoR) relevant to the project and the proportion of focus
+          within the project for each FoR. Please provide one record for each
+          relevant code. ANZSRC codes MUST be provided for all research
+          applications, awards and projects. Format: Code Set | ANZSRC FoR
+        example: '060101'
+      shareOfANZSRCFieldOfResearch:
+        type: string
+        description: >-
+          Estimate of the proportion of each Field of Research code within each
+          project. The total of all shares of FoR for a project must equal 100%.
+          Needed to derive the level of resources devoted to the different
+          Fields of Research. Format: Numeric: Percentage (Example: 0.20 for
+          20%)
+        example: '0.5'
+  AG_ANZSRCSocioeconomicObjectiveDistribution:
+    type: object
+    description: >-
+      This entity seeks information on the ANZSRC Socio-Economic Objective (SEO)
+      relevant to the project and the proportion of focus within the project for
+      each SEO. Please provide one record for each relevant code. ANZSRC codes
+      MUST be provided for all research applications, awards and projects.
+    required:
+      - ANZSRCSocioEconomicObjective
+      - shareOfANZSRCSocioEconomicObjective
+    properties:
+      ANZSRCSocioEconomicObjective:
+        type: string
+        description: >-
+          The socio-economic objective of the project according to the ANZSRC
+          over the life of the project. Enter the 6 digit ANZSRC Socio-Economic
+          classification that best reflects the overall intention or focus of
+          the project at its outset. Needed to capture the scope and reach of
+          the project according to the 6 digit SEO classification. Input data by
+          SEO is needed to demonstrate effort in particular areas. SEO
+          classifications can provide an indication of expected end users.
+          Format: Code Set | ANZSRC SEO
+        example: '820101'
+      shareOfANZSRCSocioEconomicObjective:
+        type: string
+        description: >-
+          Estimate of the proportion of each Socio-Economic Objective code
+          within each project. The total of all shares of Socio-Economic
+          Objective for a project must equal 100%. Needed to derive the level of
+          resources devoted to the different Socio-Economic objectives. Format:
+          Numeric: Percentage (Example: 0.20 for 20%)
+        example: '0.5'
+  PublicSectorResearchAlignment:
+    type: object
+    description: >-
+      This entity seeks information about the alignment of the project to New
+      Zealand Public Sector research themes, priorities and programmes. Please
+      provide one record for each priority, theme or programme.
+    required:
+      - shareOfTheme
+    properties:
+      publicSectorResearchAlignment:
+        type: string
+        description: >-
+          The type of theme, priority, or programme the award relates to.
+          Format: Code Set | Public Sector Research Alignment
+        example: '1'
+      themePriorityOrProgrammeCoRE:
+        type: string
+        description: >-
+          Funder-specific strategic research theme, priority or programme which
+          the award supports. Needed to capture contributions of awards to
+          specific themes, priorities or programmes. Conditional: Provide if
+          Public Sector Research Alignment selected in 6.g.1 is CoRE Theme (1).
+          Format: Code Set | CoRE Theme
+        example: '100'
+      themePriorityOrProgrammeNSC:
+        type: string
+        description: >-
+          Funder-specific strategic research theme, priority or programme which
+          the award supports. Needed to capture contributions of awards to
+          specific themes, priorities or programmes. Conditional: Provide if
+          Public Sector Research Alignment selected in 6.g.1 is NSC Theme (2).
+          Format: Code Set | NSC Theme
+        example: '100'
+      themePriorityOrProgrammeHRC:
+        type: string
+        description: >-
+          Funder-specific strategic research theme, priority or programme which
+          the award supports. Needed to capture contributions of awards to
+          specific themes, priorities or programmes. Conditional: Provide if
+          Public Sector Research Alignment selected in 6.g.1 is Health Research
+          Theme (3). Format: Code Set | HRC Theme
+        example: '100'
+      themePriorityOrProgrammeMPI:
+        type: string
+        description: >-
+          Funder-specific strategic research theme, priority or programme which
+          the award supports. Needed to capture contributions of awards to
+          specific themes, priorities or programmes. Conditional: Provide if
+          Public Sector Research Alignment selected in 6.g.1 is MPI Theme (4).
+          Format: Text (max 512 characters)
+        example: '100'
+      themePriorityOrProgrammeVisionMatauranga:
+        type: string
+        description: >-
+          Funder-specific strategic research theme, priority or programme which
+          the award supports. Needed to capture contributions of awards to
+          specific themes, priorities or programmes. Conditional: Provide if
+          Public Sector Research Alignment selected in 6.g.1 is Vision
+          Matāuranga Theme (4). Format: Code Set | Vision Matauranga Theme
+        example: '100'
+      shareOfTheme:
+        type: string
+        description: >-
+          Estimate of the proportion of each theme code within the award.Overlap
+          in alignment may occur; the total of shares may exceed 100%. Needed to
+          derive the level of resources aligned with a given theme. Format:
+          Numeric: Percentage (Example: 0.20 for 20%)
+        example: '1'
+  ResourceDistributed:
+    type: object
+    description: >-
+      As per specification 2.0 section 7 and its subsections. Mandatory entity
+      type if distributing public funds. The resource distributed entity seeks
+      information about resources actually distributed to an award recipient.
+      The information provided here may relate to assets distributed from one
+      asset pool to another (devolved resources) or from an asset pool to an
+      award recipient, or it could relate to the return of resources from an
+      award recipient to the asset pool (e.g. return of unused funds).
+    required:
+      - localAssetPoolID
+      - localAwardID
+      - localResourceDistributedID
+      - distributingOrganisationIDType
+      - distributingOrganisationID
+      - awardtype
+      - recipientID
+      - resourceType
+      - resourceActualQuantity
+      - distributionBasis
+      - distributionStartDate
+      - distributionEndDate
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here forconvenience. Format Numeric
+          3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format
+          Numeric 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for the asset pool distributing the resources.
+          Format: Text (max 256 characters)
+      localAwardID:
+        type: string
+        description: 'The local identifier for this award. Format: Text (max 256 characters)'
+      localContractID:
+        type: string
+        description: >-
+          The unique identifier for the contract for this award. If a contract
+          exists for this, the contract ID should be supplied. Format: Text (max
+          256 characters)
+      localResourceDistributedID:
+        type: string
+        description: >-
+          The local identifier for this resource distribution. Format: Text (max
+          256 characters)
+        example: '2'
+      distributingOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation distributing
+          the resources. If resources are being returned, the award holder will
+          be the distributing organisation. Format: Code Set | Organisation
+          Identifier Type
+        example: '2'
+      distributingOrganisationID:
+        type: string
+        description: >-
+          The identifier value for the organisation distributing the resources.
+          Enter the relevant value, e.g. the NZBN, for the Distributing
+          Organisation ID Type selected in 7.4. Format: Text (max 256
+          characters)
+        example: '9429041920244'
+      awardType:
+        type: string
+        description: >-
+          IWhether the award that is distributing the resource has been received
+          by an individual, organisation, or asset pool. An award may grant
+          resources to an individual or an organisation, or devolve resources to
+          another asset pool. Format: Code Set | Award Type
+        example: O
+      recipientIDTypeOrganisation:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation who will
+          receive the resources. Conditional: Provide if Award Type selected in
+          7.6 is Organisation (O) or Multi-Organisation (M). Format: Code Set |
+          Organisation Identifier Type
+        example: '2'
+      recipientIDTypeIndividual:
+        type: string
+        description: >-
+          Conditional: Provide if Award Type selected in 7.6 is Organisation (O)
+          or Multi-Organisation (M). Conditional: Provide if Award Type selected
+          in 7.6 is Individual (I). Format: Code Set | Person Identifier Type
+        example: '2'
+      recipientIDTypeAssetPool:
+        type: string
+        description: >-
+          The type of identifier used to identify the asset pool who will
+          receive the resources. Conditional: Provide if Award Type selected in
+          7.6 is Asset Pool (A). This must be supplied if the award is devolving
+          resources from one asset pool to another. Format: Text (max 256
+          characters). Enter either 'Local ID' or 'NZRIS ID'
+        example: Local ID
+      recipientID:
+        type: string
+        description: >-
+          The identifier value for the person, organisation, or asset pool.
+          Enter the relevant value, e.g. the NZBN, ORCID or Local Asset Pool ID,
+          for the relevant ID Type. Format: Text (max 256 characters)
+        example: '9429041920244'
+      resourceType:
+        type: string
+        description: 'The type of resource distributed. Format: Code Set | Resource Type'
+        example: D1
+      resourceActualQuantity:
+        type: string
+        description: 'The quantity of the resource distributed. Format: Digit'
+        example: '4000000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 7.11 is NZ Public Sector
+          Financial Resource (D1) or Other Financial Resource (D2). Format: Code
+          Set | ISO 4217 Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the non-currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 7.11 is Infrastructure Resource
+          (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
+          Resource Measure - Non-Currency
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied (in NZD). If the
+          resource has financial value, this value should be supplied. If
+          providing financial values in New Zealand Dollars (NZD), exclude GST.
+          Format: Money (Enter up to two decimal points)
+        example: '4000000.00'
+      distributionBasis:
+        type: string
+        description: 'The basis for distribution. Format: Code Set | Distribution Basis'
+        example: '1'
+      distributionStartDate:
+        type: string
+        format: date
+        description: >-
+          The date of first distribution of the resources. For financial
+          transactions, the start and end date will be the same date. Format:
+          Date: ISO 8601 (yyyy-mm-dd)
+      distributionEndDate:
+        type: string
+        format: date
+        description: >-
+          The date of last distribution of the resources. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  Project:
+    type: object
+    description: >-
+      As per specification 2.0 section 8 and its subsections. Record type
+      mandatory to submit if using public funds. The project entity seeks
+      information about the purpose of a project, the resources allocated to
+      achieve that purpose, who is working on the project, and metadata about
+      the project.
+    required:
+      - localProjectIdentifier
+      - projectTitle
+      - projectDescription
+      - projectStartDate
+      - projectStatus
+      - projectTypeUtilisation
+      - projectPersonnel
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format 
+          Numeric 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      parentProjectLocalID:
+        type: string
+        description: >-
+          If a parent project exists, the unique identifier for that project.
+          IIf the parent project data is supplied by the same data provider, the
+          local project identifier can be used. If the parent project
+          information is supplied by another organisation, the identifier
+          supplied is the NZRIS data provider ID concatenated with the local
+          project ID used by that data provider. Format: Text (max 256
+          characters)
+      localProjectID:
+        type: string
+        description: >-
+          The unique identifier for this project. The internal code generated by
+          the organisation for each project within their research management
+          systems; must be unique for the data provider. Format: Text (max 256
+          characters)
+      projectTitle:
+        type: string
+        description: >-
+          The short headline description of the project. The title for the award
+          and the project can be the same. Needed to communicate the nature of
+          the project and enable semantic searches. Format: Text (max 512
+          characters)
+      projectDescription:
+        type: string
+        description: >-
+          The brief description of the project that is understandable by an
+          informed but non-specialist reader. Provide a plain English
+          description that can be understood by a non-specialist, avoid jargon.
+          Needed to understand what the project is about and enable semantic
+          analysis. Format: Text: Paragraph (max 2500 characters)
+      keywords:
+        type: array
+        description: >-
+          The keyword(s) that describe topics and/or themes of significance to
+          the project.Descriptive keywords for the project; keywords may be
+          scientific terms. Needed to enable search analyses of projects and
+          groups of projects into various portfolios. Format: Text (max 256
+          characters)
+        items:
+          type: string
+        maxItems: 10
+      projectStartDate:
+        type: string
+        format: date
+        description: >-
+          The start date for the project according to the relevant agreement
+          between the parties or most recent variation. For internal projects,
+          the agreement can be an internal statement of work or memorandum.
+          Needed to capture the starting dates for projects. Projects need to be
+          time-bound to link inputs and outputs. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      projectEndDate:
+        type: string
+        format: date
+        description: >-
+          The end date for the project. The end date according to the relevant
+          agreement or most recent variation. To capture the expected duration
+          of the project (when combined with the project start date). Format:
+          Date: ISO 8601 (yyyy-mm-dd)
+      projectStatus:
+        type: string
+        description: 'The status of the project. Format: Code Set | Status'
+        example: '1'
+      benefitingRegions:
+        type: array
+        description: >-
+          The specific New Zealand region(s) and Pacific realm countries that
+          the project will benefit. Only provide this information when one or
+          more specific region(s) are expected to benefit from the project.
+          Region is limited to NZ regions, NZ realm countries, and Antarctica.
+          This is not designed to capture where the project team is based.
+          Needed to understand expected end users of the project at the regional
+          level. Format: Code Set | Benefiting Region
+        items:
+          type: string
+        maxItems: 10
+        example:
+          - '01'
+          - '02'
+          - '03'
+      projectTypeUtilisation:
+        type: array
+        description: >-
+          The distribution of resources by project type for this project. Refer
+          to Section 8.a
+        items:
+          $ref: '#/definitions/ProjectTypeUtilisation'
+        minItems: 1
+        maxItems: 6
+      ANZSRCTypeOfActivityDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Activity code. Refer to
+          Section 8.b
+        items:
+          $ref: '#/definitions/ANZSRCTypeOfActivityDistribution'
+        minItems: 0
+        maxItems: 6
+      ANZSRCFieldOfResearchDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Field of Research. Refer to
+          Section 8.c
+        items:
+          $ref: '#/definitions/ANZSRCFieldOfResearchDistribution'
+        minItems: 0
+        maxItems: 5
+      ANZSRCSocioEconomicObjectiveDistribution:
+        type: array
+        description: >-
+          The distribution of resources by ANZSRC Socio-economic Objective.
+          Refer to Section 8.d
+        items:
+          $ref: '#/definitions/ANZSRCSocioEconomicObjective'
+        minItems: 0
+        maxItems: 5
+      publicSectorResearchAlignment:
+        type: array
+        description: >-
+          Project alignment with public sector research themes. Refer to Section
+          8.e
+        items:
+          $ref: '#/definitions/PublicSectorResearchAlignment'
+      projectPersonnel:
+        type: array
+        description: >-
+          The roles and identifiers for personnel working on the project. Refer
+          to Section 8.f
+        items:
+          $ref: '#/definitions/ProjectPersonnel'
+        minItems: 1
+      protectionRequirements:
+        type: array
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  ProjectTypeUtilisation:
+    type: object
+    description: >-
+      This entity seeks information about the types of activities the project
+      involves. Please provide one record for each type (up to five).
+    required:
+      - projectType
+      - shareOfProjectType
+    properties:
+      projectType:
+        type: string
+        description: >-
+          Project activities classified according to one of five types (plus
+          administration). Select up to five project types based on the overall
+          intention or focus of the project at the outset of the project. Most
+          projects will fall into only one project type. Needed to understand
+          the balance of effort within the system on R&D and related activities.
+          Also used to determine whether ANZSRC codes are required. Format: Code
+          Set | Project Type
+        example: RD
+      shareOfProjectType:
+        type: string
+        description: >-
+          Estimate of the proportion of total project resources utilised on
+          identified project type. The total of shares across all project types
+          must equal 1 for a project. Needed to understand the level of
+          resources devoted to different project types. Format: Numeric:
+          Percentage (Example: 0.20 for 20%)
+        example: '1'
+  ProjectPersonnel:
+    type: object
+    description: >-
+      The total of shares across all project types must equal 1 for a project.
+      Needed to understand the level of resources devoted to different project
+      types
+    required:
+      - personIDType
+      - personID
+      - personnelRole
+      - startDate
+      - FTEAllocation
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person. Format: Code Set |
+          Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the person. Enter the relevant value, e.g.
+          the ORCID ID, for the Person ID Type selected in 8.f.1. Format: Text
+          (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      personnelRole:
+        type: string
+        description: >-
+          The role the person performs on this project. Needed to capture the
+          roles associated with each project. Format: Code Set | Personnel
+          (Project) Role
+        example: R1
+      startDate:
+        type: string
+        format: date
+        description: >-
+          The date the person started in this role. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      endDate:
+        type: string
+        format: date
+        description: >-
+          The date the person ended in this role. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      FTEAllocation:
+        type: string
+        description: >-
+          The proportion of full time work that the person is allocated to this
+          role. Use the budgeted allocation for this person. When an allocation
+          changes for that person, add a new record with a new start / end date
+          and the proposed allocation for that period. Format: Numeric:
+          Percentage (Example: 0.20 for 20%)
+        example: '0.2'
+      localRoleDescription:
+        type: string
+        description: >-
+          The project specific description of the person’s role in the project.
+          Needed to allow additional data analysis and research to inform code
+          set development. Format: Text (max 512 characters)
+        example: Lead Researcher
+  AwardReceived:
+    type: object
+    description: >-
+      As per data specification version 2.0 section 9. Mandatory record type to
+      provide for organisations managing RS&I activity, if using public funds.
+      The award received entity seeks information about awards received for
+      projects, the asset pool granting the awards, the resources allocated, the
+      agreed lead practitioner, and any constraints on use. An award may be
+      granted by an organisation which supplies information to NZRIS, in which
+      case, the record will be matched with the record supplied by the asset
+      pool. If the organisation that granted the award doesn’t supply
+      information to NZRIS (e.g. an overseas fund or government) the information
+      provided will enable NZRIS to provide a broad view of the sources and
+      types of resources supplied to the RS&I sector.
+    required:
+      - localAssetPoolID
+      - assetPoolName
+      - localAwardID
+      - awardTitle
+      - awardDescription
+      - subjectToOpenContestability
+      - awardStartDate
+      - awardEndDate
+      - awardStatus
+      - organisations
+      - protectionRequirements
+      - awardType
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for the asset pool which granted this award.
+          Format: Text (max 256 characters)
+      assetPoolName:
+        type: string
+        description: >-
+          The commonly used name for the asset pool. Needed to identify the
+          source of the resource(s) if the Asset Pool does not supply data to
+          NZRIS. Format: Text (max 512 characters)
+      parentLocalAwardID:
+        type: string
+        description: >-
+          The local identifier for the parent award of this award. If this award
+          is a subcontract from another award, that award is the parent award.
+          If the parent award is supplied by the same data provider, the local
+          award identifier can be used. If the parent award information is
+          supplied by another organisation, the identifier supplied is the NZRIS
+          data provider ID concatenated with the local project ID used by that
+          data provider. Format: Text (max 256 characters)
+      localAwardID:
+        type: string
+        description: 'The local identifier for this award. Format: Text (max 256 characters)'
+      localContractID:
+        type: string
+        description: >-
+          The unique identifier for the contract for this award. Conditional: If
+          a contract is issued for this Award, the Contract ID should be
+          supplied. Format: Text (max 256 characters)
+      localProjectID:
+        type: array
+        description: >-
+          The unique identifier for the project(s) the award resources have been
+          allocated to. Conditional: If the project has been set up, this
+          information must be supplied. Format: Text (max 256 characters)
+        items:
+          type: string
+      awardTitle:
+        type: string
+        description: >-
+          The short headline description of this award. As stated in the
+          contract. Needed to communicate the nature of the award. Format: Text
+          (max 512 characters)
+        example: Endeavour Fund Asset Pool award to Research Programmes Asset Pool
+      awardDescription:
+        type: string
+        description: >-
+          The brief description of the award that is understandable by an
+          informed but non-specialist reader. This may be the description of the
+          expected outcomes of the award or, in the case of funding awarded to a
+          single project, the project's description. Needed to understand what
+          the award is about, what the award seeks to achieve, and enable search
+          functionality. Format: Text: Paragraph (max 2500 characters)
+      subjectToOpenContestability:
+        type: string
+        description: >-
+          Project funding allocated on the basis of an open competition. Open
+          contests must be open to all research organisations in New Zealand.
+          Examples of contestable projects would be where the fund type of the
+          award funding the project is contestable, or where the project is won
+          competitively through contestable rounds within primary awards (e.g.
+          CoREs and NSCs). Needed to calculate the extent of contestability of
+          funding across the system. Format: Text (max 256 characters). Enter
+          either 'Yes', 'No' or 'Not Applicable'
+        example: 'Yes'
+      awardStartDate:
+        type: string
+        format: date
+        description: >-
+          Start date as indicated in award agreement or most recent variation.
+          Needed to understand when financial contributions to the system are
+          made. Format: Date: ISO 8601 (yyyy-mm-dd)
+      awardEndDate:
+        type: string
+        format: date
+        description: >-
+          End date as indicated in award agreement or most recent variation.
+          Needed to understand when financial contributions to the system are
+          made. Format: Date: ISO 8601 (yyyy-mm-dd)
+      awardStatus:
+        type: string
+        description: >-
+          The status of the award. Needed to identify when awards are actively
+          being utilised. Format: Code Set | Status
+        example: '1'
+      awardType:
+        type: string
+        description: >-
+          Whether this award has been received by an individual, organisation,
+          or asset pool. Needed to identify whether resources are being devolved
+          or allocated to proposed projects. Format: Code Set | Award Type
+        example: '1'
+      organisations:
+        type: array
+        description: >-
+          The identifiers and roles for the organisations party to the award.
+          Refer to Section 9.a
+        items:
+          $ref: '#/definitions/AwardOrganisation'
+        minItems: 1
+      agreedPersonnel:
+        type: array
+        description: >-
+          The identifiers for the agreed personnel specified in the award. Refer
+          to Section 9.b
+        items:
+          $ref: '#/definitions/AgreedPersonnel'
+      allocatedResources:
+        type: array
+        description: The allocated resources specified in the award. Refer to Section 9.c
+        items:
+          $ref: '#/definitions/AwardResource'
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+      AssetPoolRecipientIDType:
+        type: string
+        description: >-
+          The type of identifier used for the recipient asset pool Conditional:
+          Provide if Award Type selected in 9.13 is Asset Pool (A). This must be
+          supplied if the award is devolving resources from one asset pool to
+          another. Format: Text (max 256 characters). Enter either 'Local ID' or
+          'NZRIS ID'
+        example: '1'
+      AssetPoolRecipientID:
+        type: string
+        description: >-
+          The identifier value for the recipient asset pool. Enter the relevant
+          ID number for the Asset Pool Recipient ID Type selected in 9.14.
+          Format: Text (max 256 characters)
+        example: '1'
+      IndividualRecipientIDType:
+        type: string
+        description: >-
+          The type of identifier used for the individual recipient. Conditional:
+          Provide if Award Type selected in 9.13 is Individual (I). Format: Code
+          Set | Person Identifier Type
+        example: '1'
+      IndividualRecipientID:
+        type: string
+        description: >-
+          The identifier value for the individual recipient. Enter the relevant
+          value, e.g. the ORCID ID, for the Person ID Type selected in 9.16.
+          Format: Text (max 256 characters)
+        example: '1'
+  AwardOrganisation:
+    type: object
+    description: >-
+      This entity seeks information about the organisations involved in making
+      and receiving awards from the asset pool. Please provide one record for
+      each organisation involved. A record must be provided for the organisation
+      that administers the award. Conditional: Provide a record for the
+      recipient organisation if Award Type entered for element 6.13 is
+      Organisation (O) or Multi-Organisation (M).
+    required:
+      - organisationIDType
+      - organisationID
+      - organisationRole
+    properties:
+      organisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this organisation. Format:
+          Code Set | Organisation Identifier Type
+        example: '2'
+      organisationID:
+        type: string
+        description: >-
+          The identifier value for this organisation. Enter the relevant value,
+          e.g. the NZBN, for the organisation identifier type selected in 9.a.1.
+          Format: Text (max 256 characters)
+        example: '9429041920244'
+      organisationRole:
+        type: string
+        description: >-
+          The role of the organisation in relation to the project. Needed to
+          identify the different organisations involved in the project, and
+          their role. Format: Code Set | Organisation Project Role
+        example: '1'
+  AgreedPersonnel:
+    type: object
+    description: >-
+      This entity seeks information about the people who have been agreed to
+      have roles on the project. Please provide one record for each such person.
+      A record must be provided for the lead contributor.
+    required:
+      - personIDType
+      - personID
+      - role
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person. Format: Code Set |
+          Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the person. Enter the relevant value, e.g.
+          the ORCID ID, for the person identifier type selected in 9.b.1.
+          Format: Text (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+      role:
+        type: string
+        description: >-
+          The role of the person on this project. Format: Code Set | Personnel
+          (Project) Role
+        example: R1
+      localRoleDescription:
+        type: string
+        description: >-
+          The project-specific description of the person’s role in the project.
+          Needed to allow additional data analysis and research to inform code
+          set development. Format: Text (max 512 characters)
+        example: Lead Researcher
+  AllocatedResource:
+    type: object
+    description: >-
+      This entity seeks information about the resources granted to the project
+      by the award. Please provide one record for each allocated resource.
+    required:
+      - localResourceID
+      - ResourceType
+      - minimumResourceQuantity
+      - startDate
+      - endDate
+    properties:
+      localResourceID:
+        type: string
+        description: >-
+          The local identifier for this resource. Format: Text (max 256
+          characters)
+        example: D1
+      minimumResourceQuantity:
+        type: string
+        description: 'The minimum resource quantity received in this award. Format: Digit'
+      maximumResourceQuantity:
+        type: string
+        description: >-
+          The maximum resource quantity received in this award. Conditional: If
+          a fixed quantity is available specify the quantity as the minimum
+          quantity and do not populate the maximum quantity. If the resource
+          quantity is variable, populate both the minimum and maximum quantity
+          values. Format: Digit
+      resourceType:
+        type: string
+        description: 'The type of resource distributed. Format: Code Set | Resource Type'
+        example: D1
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 9.c.2 is NZ Public Sector
+          Financial Resource (D1) or Other Financial Resource (D2). Format: Code
+          Set | ISO 4217 Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the non-currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 9.c.2 is Infrastructure Resource
+          (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
+          Resource Measure - Non-Currency
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied. In some cases
+          (e.g. provision of facilities, allocation of FTE) a resource value can
+          be specified. In some cases (e.g. use of a restricted data set) a
+          value may not be able to be specified. If providing financial values
+          in New Zealand Dollars (NZD), exclude GST. Format: Money (enter up to
+          two decimal points)
+        example: '4000000.00'
+      startDate:
+        type: string
+        format: date
+        description: >-
+          The agreed start of the period of use of the resources. Format: Date:
+          ISO 8601 (yyyy-mm-dd)
+      endDate:
+        type: string
+        format: date
+        description: >-
+          The agreed end of the period of use of the resources. Format: Date:
+          ISO 8601 (yyyy-mm-dd)    
+  ResourceReceived:
+    type: object
+    description: >-
+      As per specification 2.0 section 10 and its subsections. Mandatory record
+      type to provide for RSI activity managers if receiving public funds. The
+      resource received entity seeks information about the resources received by
+      a project, the asset pool distributing the resources, and the actual
+      resources supplied. The resources involved may be either received from an
+      asset pool by an award recipient, or returned by an award recipient to the
+      asset pool (e.g. return of unused funds). 
+    required:
+      - localAssetPoolID
+      - distributingOrganisationIDType
+      - distributingOrganisationID
+      - recipientID
+      - resourceType
+      - resourceActualQuantity
+      - distributionBasis
+      - distributionStartDate
+      - distributionEndDate
+      - protectionRequirements
+      - localResourceReceivedID
+      - awardType
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localAssetPoolID:
+        type: string
+        description: >-
+          The local identifier for this asset pool. Format: Text (max 256
+          characters)
+      localAwardID:
+        type: string
+        description: 'The local identifier for this award. Format: Text (max 256 characters)'
+      localContractID:
+        type: string
+        description: >-
+          The unique identifier for the contract for this award. If a contract
+          is issued for the Award this distribution relates to, the contract ID
+          should be supplied. Format: Text (max 256 characters)
+      localResourceReceivedID:
+        type: string
+        description: >-
+          The local identifier for this resource once received. Format: Text
+          (max 256 characters) 
+      distributingOrganisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation distributing
+          the resources. If resources are being returned, the award holder will
+          be the distributing organisation. Format: Code Set | Organisation
+          Identifier Type
+        example: '2'
+      distributingOrganisationID:
+        type: string
+        description: >-
+          The identifier value for the organisation distributing the resources.
+          Enter the relevant value, e.g. the NZBN, for the Distributing
+          Organisation ID Type selected in 10.4. Format: Text (max 256
+          characters)
+        example: '9429041920244'
+      awardType:
+        type: string
+        description: >-
+          Whether this award has been made to an individual, organisation, or
+          asset pool. An award may grant resources to an individual or an
+          organisation, or devolve resources to another asset pool. Format: Code
+          Set | Award Type
+        example: '1'
+      recipientIDTypeOrganisation:
+        type: string
+        description: >-
+          The type of identifier used to identify the organisation who will
+          receive the resources. Conditional: Provide if Award Type selected in
+          10.6 is Organisation (O) or Multi-Organisation (M). Needed to
+          facilitate NZRIS data linking. Format: Code Set | Organisation
+          Identifier Type
+        example: '2'
+      recipientIDTypeIndividual:
+        type: string
+        description: >-
+          The type of identifier used to identify the person who will receive
+          the resources. Conditional: Provide if Award Type selected in 10.6 is
+          Individual (I). Needed to facilitate NZRIS data linking. Format: Code
+          Set | Person Identifier Type
+        example: '2'
+      recipientIDTypeAssetPool:
+        type: string
+        description: >-
+          Conditional: Provide if Award Type selected in 10.6 is Individual (I).
+          Needed to facilitate NZRIS data linking. Conditional: Provide if Award
+          Type selected in 10.6 is Asset Pool (A). This must be supplied if the
+          award is devolving resources from one asset pool to another. Needed to
+          facilitate NZRIS data linking. Format: Text (max 256 characters).
+          Enter either 'Local ID' or 'NZRIS ID'
+        example: '2'
+      recipientID:
+        type: string
+        description: >-
+          The identifier value for the person, organisation, or asset pool.
+          Enter the relevant value, e.g. the NZBN, ORCID or Local Asset Pool ID,
+          for the relevant Identifier type. Format: Text (max 256 characters)
+        example: '9429041920244'
+      resourceType:
+        type: string
+        description: 'The type of resource distributed. Format: Code Set | Resource Type'
+        example: D1
+      resourceActualQuantity:
+        type: string
+        description: >-
+          The quantity of the resource distributed. Enter the relevant quantity
+          for the Resource Type selected in 10.11. Format: Digit
+        example: '200000.00'
+      resourceMeasureCurrency:
+        type: string
+        description: >-
+          The measure of the currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 10.11 is NZ Public Sector
+          Financial Resource (D1) or Other Financial Resource (D2). Format: Code
+          Set | ISO 4217 Currency Codes
+        example: '1'
+      resourceMeasureNonCurrency:
+        type: string
+        description: >-
+          The measure of the non-currency resource being supplied. Conditional:
+          Provide if Resource Type selected in 10.11 is Infrastructure Resource
+          (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
+          Resource Measure - Non-Currency
+        example: '1'
+      resourceValue:
+        type: string
+        description: >-
+          The financial value of the resource being supplied. In some cases
+          (e.g. provision of facilities, allocation of FTE) a resource value can
+          be specified. In some cases (e.g. use of a restricted data set) a
+          value may not be able to be specified. If providing financial values
+          in New Zealand Dollars (NZD), exclude GST. Format: Money (enter up to
+          two decimal points)
+        example: '200000.00'
+      distributionBasis:
+        type: string
+        description: 'The basis for distribution. Format: Code Set | Distribution Basis'
+        example: '1'
+      distributionStartDate:
+        type: string
+        format: date
+        description: >-
+          The date of first distribution of the resources. For financial
+          transactions, the start and end date will be the same date. Format:
+          Date: ISO 8601 (yyyy-mm-dd)
+      distributionEndDate:
+        type: string
+        format: date
+        description: >-
+          The date of last distribution of the resources. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      protectionRequirements:
+        type: array
+        description: 'Protection Patterns required, mandatory to supply with record'
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  Output:
+    type: object
+    description: >-
+      As per specification 2.0 section 11 and its subsections. Mandatory record
+      type for an RSI activity manager to provide if using public funds. The
+      output entity seeks information about outputs created as a result of RS&I
+      activity, and contributors, related projects, and identifiers for the
+      output. An output can be recorded without information about related awards
+      or projects. Note – business rules may be applied in future to ensure the
+      output type aligns with the project type. Some outputs can only be
+      associated with particular project types, for example the outputs of
+      commercialisation activities are not the same as the outputs of scientific
+      services projects.
+    required:
+      - ORCIDoutputType
+      - outputTitle
+      - accessType
+      - productionDate
+      - outputDescription
+      - contributors
+      - identifiers
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      ORCIDoutputType:
+        type: string
+        description: >-
+          The ORCID work type most appropriate for the output. Format: Code Set
+          | ORCID Output Types
+        example: journal-article
+      TECoutputType:
+        type: string
+        description: >-
+          The TEC work type code best describing the output. Only supplied by
+          organisations using TEC output codes. The Code Set has been extracted
+          from the TEC PBRF 2018 Quality Evaluation EP Schema Definition.
+          Format: Code Set | TEC Output Type
+      outputLanguage:
+        type: string
+        description: >-
+          The primary language of the output. Format: Code Set | Output Language
+          (ISO 639-2/T)
+        example: eng
+      localOutputType:
+        type: string
+        description: >-
+          A short text description of the type of output. The preferred local
+          description of the output type. Needed to enable output type to be
+          described as perceived by the researcher without the constraint of a
+          code set. Format: Text (max 256 characters)
+        example: Peer Review Research Journal Article
+      outputTitle:
+        type: string
+        description: >-
+          The title of the output. Needed to have useful contextual information
+          about an output that can be used for analysing and clustering topics
+          and themes. Format: Text (max 512 characters)
+      accessType:
+        type: string
+        description: >-
+          The type of access available for the output. Format: Code Set | Access
+          Type
+        example: O
+      productionDate:
+        type: string
+        format: date
+        description: >-
+          The date of publication, release, opening or granting. Needed to track
+          when outputs are produced. Format: Date: ISO 8601 (yyyy-mm-dd)
+      outputDescription:
+        type: string
+        description: >-
+          Basic description of the contents of the output. For many output types
+          (e.g. journal articles), this is the abstract. Needed to understand
+          the content and nature of outputs. Format: Text: Paragraph (max 2500
+          characters))
+      localProjectIDs:
+        type: array
+        description: >-
+          The NZRIS project identifier(s) that the output is from. If the output
+          is the result of a project recorded in NZRIS, the identifier must be
+          supplied. Format: Text (max 256 characters)
+        items:
+          type: string
+        maxItems: 10
+      contributors:
+        type: array
+        description: >-
+          The name(s) of output contributor(s) or creator(s). Refer to Section
+          11.a
+        items:
+          $ref: '#/definitions/OutputContributor'
+        minItems: 1
+      identifiers:
+        type: array
+        description: The identifiers for the output. Refer to Section 11.b
+        items:
+          $ref: '#/definitions/OutputIdentifier'
+        minItems: 1
+        maxItems: 10
+      protectionRequirements:
+        type: array
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  OutputContributor:
+    type: object
+    description: >-
+      This entity seeks information about contributors to the project’s outputs.
+      Please provide one record for each contributor. 
+    required:
+      - personIDType
+      - personID
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify the person. Format: Code Set |
+          Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The identifier value for the person. Enter the relevant value, e.g.
+          the ORCID ID, for the Person ID Type selected in 11.a.1. Format: Text
+          (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+  OutputIdentifier:
+    type: object
+    description: >-
+      This entity seeks identifiers for project outputs. Please provide a record
+      for each output. Note: outputs may or may not be publicly accessible.
+    required:
+      - outputIDType
+      - outputID
+    properties:
+      outputIDType:
+        type: string
+        description: >-
+          To indicate what type of identifier has been supplied. Format: Code
+          Set | Output Identifier Type
+        example: '100'
+      outputID:
+        type: string
+        description: >-
+          A specific identifier for the output. Enter the relevant identifier
+          for the Output ID Type selected in 11.b.1. Format: Text (max 256
+          characters)
+        example: '1500818100'
+  Person:
+    type: object
+    description: >-
+      As per data specification 2.0, section 12. The person record describes an
+      individual person and their attributes. Many records may be provided by
+      multiple organisations over time for an individual person. Using unique
+      identifiers, these records will be consolidated to a single identity
+      record for that person. Initially, a single record per organisation may be
+      constructed for each person. As external identifier information is
+      supplied, identity information will be linked across multiple
+      organisations to achieve a single person record for each person.
+      Acknowledging that specific aspects of identity can change over time (e.g.
+      gender, ethnicity, name), this information can be provided as it was at a
+      given point in time; the author of an output may change their name,
+      gender, or ethnicity at a later date. Data providers must submit data for
+      the Person entity for every individual identified in data they submit to
+      NZRIS. The data provided by the current primary employer of the person
+      will be considered the master record when data conflicts are identified.
+      Data providers must update submitted data when new or updated information
+      about a person is available (e.g. a new academic qualification, a change
+      of name). Where an ORCID identifier is supplied, and the ORCID record is
+      accessible and contains all mandatory person data, no further information
+      will be required from the data provider for that person. Additional
+      information may be supplied if the data provider wishes to do so.
+    required:
+      - localPersonId
+      - givenName
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localPersonId:
+        type: string
+        description: >-
+          The local identifier for this person supplied by the organisation
+          submitting the record. This must be a single unique identifier for the
+          data provider, which will continue to be used over time, and must not
+          be re-used for another person.  Format Text (max 256 characters)
+          example 'https://orcid.org/0000-0001-1111-1111'
+      givenName:
+        type: string
+        description: |-
+          The given name for this individual. Format Text (max 512
+            characters)
+      otherGivenNames:
+        type: array
+        description: |-
+          Additional given names for this individual. Format Text (max 512
+            characters)
+        items:
+          type: string
+      familyName:
+        type: string
+        description: >-
+          The family name for this individual. If the person has a family name,
+          this must be supplied – only for persons with a mononym can this
+          element be left empty. Needed to facilitate identification of people
+          and data matching. Format Text (max 512 characters)
+      dateOfBirth:
+        type: string
+        format: date
+        description: >-
+          The date of birth of the person. To enable analysis by age demographic
+          across the sector. This information is only used at aggregated levels
+          for statistical and reporting purposes. Format Date ISO 8601
+          (yyyy-mm-dd)
+      gender:
+        type: string
+        description: >-
+          The gender identity of the person. Needed to enable analysis by gender
+          demographic across the sector. This information is only used at
+          aggregated levels for statistical and reporting purposes. Format Code
+          Set | Gender Identity Classification. example '3'
+      priorLocalPersonID:
+        type: string
+        description: >-
+          The previous local person ID used for this person. This identifier
+          should not be an identifier for another purpose (e.g. IRD number,
+          staff number). For use when local identifiers must be changed (e.g.
+          software migration, database update). Format Text (max 256
+            characters)
+      genderOtherInformation:
+        type: string
+        description: >-
+          Additional gender information supplied if desired. Needed to further
+          identify the gender identity of the person. Format Text (max 512
+            characters)
+      ethnicity:
+        type: array
+        description: >-
+          The ethnic group or groups with which the person identifies or feels
+          they belong. Ethnicity is self-perceived and people can belong to more
+          than one ethnic group. Needed to enable analysis and understand the
+          ethnic diversity across the system. This information is only used at
+          aggregated levels for statistical and reporting purposes. Format Level
+          2 or Level 4 Code Set | Ethnicity Classification. Example 31
+        items:
+          type: string
+          maxItems: 3
+      iwiAffiliation:
+        type: array
+        description: >-
+          The iwi affiliation(s) of the person Iwi today is the focal economic
+          and political unit of the traditional Māori descent and kinship based
+          hierarchy of: Waka (founding canoe), iwi (tribe), hapū (sub-tribe) and
+          whānau (family). Multiple responses are allowed. The Māori Reference
+          Group will be asked to provide additional guidance around this
+          element. Needed to allow the Crown and Iwi to monitor obligations
+          under the Treaty of Waitangi. Also assists iwi in planning and
+          resourcing. This information is only used at aggregated levels for
+          statistical and reporting purposes. Format: Code Set | Iwi
+          Classification
+        items:
+          type: string
+        example:
+          - '0100'
+      sectorPersonIds:
+        type: array
+        description: External identifier(s) for this person (e.g. ORCID ID). Refer to 12.a
+        items:
+          $ref: '#/definitions/SectorPersonIdentifier'
+      researchCareerStage:
+        type: array
+        description: The career stages over time of the person. Refer to 12.b
+        items:
+          $ref: '#/definitions/PersonResearchCareerStage'
+      academicRecord:
+        type: array
+        description: The academic record for the person. Refer to 12.c
+        items:
+          $ref: '#/definitions/PersonAcademicRecord'
+      recognition:
+        type: array
+        description: Recognition received by the person (e.g. a medal). Refer to 12.d
+        items:
+          $ref: '#/definitions/PersonRecognition'
+      professionalBodies:
+        type: array
+        description: 'Professional body memberships and qualifications. Refer to 12.e Note: '
+        items:
+          $ref: '#/definitions/PersonProfessionalBodies'
+      organisationAffiliations:
+        type: array
+        description: Relationship with an organisation. Refer to 12.f
+        items:
+          $ref: '#/definitions/PersonOrganisationAffiliation'
+      protectionRequirements:
+        type: array
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  SectorPersonIdentifier:
+    type: object
+    description: >-
+      This entity seeks further information about people identified in relation
+      to other entities within NZRIS. Please provide one record for each person.
+    required:
+      - personIDType
+      - personID
+    properties:
+      personIDType:
+        type: string
+        description: >-
+          The type of external identifier used to identify this person. Format:
+          Code Set | Person Identifier Type
+        example: '2'
+      personID:
+        type: string
+        description: >-
+          The external identifier value for this person. Enter the relevant
+          value, e.g. the ORCID ID, for the Person ID Type selected in 12.a.1.
+          Format: Text (max 256 characters)
+        example: 'https://orcid.org/0000-0001-1111-1111'
+  PersonResearchCareerStage:
+    type: object
+    description: >-
+      This entity seeks information about the career stages of people identified
+      in relation to other entities within NZRIS. Please provide one record for
+      each person.
+    required:
+      - careerStage
+      - yearAchieved
+    properties:
+      careerStage:
+        type: string
+        description: >-
+          The career stage of the researcher. Format: Code Set | Person Career
+          Stage
+        example: R1
+      yearAchieved:
+        type: string
+        description: >-
+          The year in which the person first attained the specified career
+          stage. Needed to understand the proportion of researchers at different
+          stages of their career. Can assist in development of funding
+          mechanisms and support tools. This information is only used at
+          aggregated levels for statistical and reporting purposes. Format:
+          Date: YYYY
+        example: '1999'
+  PersonAcademicRecord:
+    type: object
+    description: >-
+      This entity seeks information about the academic records of people
+      identified in relation to other entities within NZRIS. Please provide one
+      record for each person.
+    required:
+      - academicQualification
+    properties:
+      academicQualification:
+        type: string
+        description: >-
+          The name of the tertiary qualification held by the researcher. Needed
+          to enable analysis of the effects of qualifications on research
+          performance. Format: Select from either Code Set NZREG (v1.0) or Code
+          Set | ISCED-P
+        example: '10'
+      dateConferred:
+        type: string
+        format: date
+        description: >-
+          Date on which the qualification was conferred. Needed to assist in
+          analysis of career paths and trajectories. Format: Date: ISO 8601
+          (yyyy-mm-dd)
+      discipline:
+        type: string
+        description: >-
+          Discipline of the qualification.  Needed to enable analysis of the
+          effects of disciplines on research performance and trajectories.
+          Format: Select from either Code set | NZSCEDFIELD or Code set |
+          ISCED-F
+        example: '010101'
+      awardingInstitution:
+        type: string
+        description: >-
+          Institution having awarded the qualification. Needed to enable
+          analysis of links between researchers and institutions. Format: Text
+          (max 512 characters)
+      researchTopic:
+        type: string
+        description: >-
+          Topic of research undertaken to achieve qualification. Needed to
+          enable analysis of the relationship between research in study and
+          later research activity. Format: Text (max 512 characters)
+      researchStartYear:
+        type: string
+        description: >-
+          The year in which the person started research in the specified area.
+          Needed to understand career trajectories and needs for succession
+          planning and support for particular groups. Format: Date: YYYY
+        example: '1996'
+  PersonRecognition:
+    type: object
+    description: >-
+      This entity seeks information about prizes or medals received by people
+      during their career. Please provide one record for each prize or medal.
+    required:
+      - prestigiousPrizeOrMedal
+    properties:
+      prestigiousPrizeOrMedal:
+        type: string
+        description: >-
+          A prestigious prize or medal awarded to a researcher. This entity
+          seeks information about prizes or medals received by people during
+          their career. Please provide one record for each prize or medal.
+          Format: Text (max 512 characters)
+      awardingInstitution:
+        type: string
+        description: >-
+          The institution awarding the prize or medal. Needed to recognise the
+          awarding institution. Format: Text (max 512 characters)
+      amount:
+        type: string
+        description: >-
+          The amount of the prize or medal.  Needed to recognise the
+          additionality and financial contribution to research associated with a
+          prize or medal. Format: Money (enter up to two decimal points)
+      yearOfRecognition:
+        type: string
+        description: >-
+          The year in which the prize or medal was awarded. Needed to enable
+          analysis over time of recognition for contribution. Format: Date: YYYY
+        example: '1999'
+  PersonProfessionalBodies:
+    type: object
+    description: >-
+      This entity seeks information about the professional bodies people
+      identified in relation to other entities within NZRIS belong to. Please
+      provide one record for each professional body. Please include all
+      applicable memberships, including NZBN if relevant.
+    properties:
+      professionalMembership:
+        type: string
+        description: >-
+          The name of a professional body or association to which the researcher
+          belongs. A professional body may include bodies responsible for
+          accreditation such as clinical colleges. Needed to recognise
+          membership of professional bodies. Format: Text (max 512 characters)
+      organisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this organisation. Format:
+          Code Set | Organisation Identifier Type
+        example: '2'
+      organisationID:
+        type: string
+        description: >-
+          The identifier value for this organisation. Enter the relevant value
+          for the Organisation ID Type selected in 12.e.2. Format: Text (max 256
+          characters)
+        example: '9429041920244'
+      professionalQualification:
+        type: string
+        description: >-
+          A qualification granted by a professional body. Needed to recognise
+          qualifications other than academic. Format: Text (max 512 characters)
+  PersonOrganisationAffiliation:
+    type: object
+    description: >-
+      This entity seeks information about the organisational affiliations of
+      people identified in relation to other entities within NZRIS. Please
+      provide one record for each affiliation.
+    required:
+      - organisationIDType
+      - organisationID
+    properties:
+      organisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this organisation with whom
+          the person holds the specified role. Format: Code Set | Organisation
+          Identifier Type (section 11.4). 
+        example: '02'
+      organisationID:
+        type: string
+        description: >-
+          The identifier value for this organisation with whom the person holds
+          the specified role. Enter the relevant value for the Organisation ID
+          Type selected in 12.f.1. Format: Text (max 256 characters)
+        example: '9429041920244'
+      localRoleDescription:
+        type: string
+        description: >-
+          The organisation specific description of the person’s role (i.e. job
+          title). Enables data analysis to inform code set development. Format:
+          Text (max 512 characters)
+  Organisation:
+    type: object
+    description: >-
+      As per specification 2.0 section 13 and its subsections. Mandatory entity
+      type. The organisation entity seeks data about organisations. Information
+      about a single organisation may be provided by multiple providers. Using
+      unique identifiers, these records will be consolidated into a single
+      identity record for that organisation. A single identity record will
+      include any changes to specific data, such as the name of the
+      organisation, that occur over time.Data providers must submit data for the
+      Organisation entity for every organisation identified in records they
+      submit to NZRIS. The data provided by an organisation about itself will be
+      considered the master record for that organisation when data conflicts are
+      identified. Data providers must update submitted data when new or updated
+      information about an organisation is available (e.g. a new name, or new
+      external identifier).
+    required:
+      - localOrganisationID
+      - organisationType
+      - organisationName
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for  convenience. Format 
+          Numeric 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localOrganisationID:
+        type: string
+        description: |-
+          The local identifier for this organisation. Format Text (max 256
+            characters)
+      organisationType:
+        type: string
+        description: >-
+          The type of organisation. Needed to understand the relative allocation
+          and effort across the system by type of organisation. Format Code Set
+          | Organisation Type example: DA01
+      priorLocalOrganisationID:
+        type: string
+        description: >-
+          The previous local organisation ID used for this organisation. For use
+          when local identifiers must be changed (e.g. software migration,
+          database update). Format  Text (max 256 characters) example:
+          '9429041920244'
+      parentOrganisationIDType:
+        type: string
+        description: >-
+          The Organisation Identifier Type for the parent of this organisation
+          (if   applicable). Needed to enable linking organisational hierarchies
+          (e.g. organisational units/departments to parent organisation).
+          Format: Code Set | Organisation Identifier Type
+        example: '2'
+      parentOrganisationID:
+        type: string
+        description: >-
+          The local identifier for the parent of this organisation (if
+          applicable). Enter the relevant value for the Organisation ID Type
+          selected in 13.4. Format: Text (max 256 characters)
+        example: '9429041920244'
+      dateOfEstablishment:
+        type: string
+        format: date
+        description: >-
+          The date of establishment of the organisation. Needed to understand
+          the relevance of an organisation in the sector over time. This
+          information is only used at aggregated levels for statistical and
+          reporting purposes. Format: Date: ISO 8601 (yyyy-mm-dd)
+      dateOfDisestablishment:
+        type: string
+        format: date
+        description: >-
+          The date of disestablishment of the organisation. Needed to understand
+          the relevance of an organisation in the sector over time. This
+          information is only used at aggregated levels for statistical and
+          reporting purposes. Format: Date: ISO 8601 (yyyy-mm-dd)
+      organisationIdentifiers:
+        type: array
+        description: >-
+          The sector wide unique identifiers for the organisation. Refer to
+          Section 13.a
+        items:
+          $ref: '#/definitions/OrganisationIdentifier'
+      contributingOrganisations:
+        type: array
+        description: >-
+          The identifiers for an organisation contributing resources to this
+          organisation. Refer to Section 13.b
+        items:
+          $ref: '#/definitions/OrganisationContributingOrganisation'
+      organisationNames:
+        type: array
+        description: The names by which the organisation is known. Refer to Section 13.c
+        items:
+          $ref: '#/definitions/OrganisationName'
+        minItems: 1
+      protectionRequirements:
+        type: array
+        description: Protection requirements for record
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  OrganisationIdentifier:
+    type: object
+    description: >-
+      This entity seeks information about the organisations identified in
+      relation to other entities within NZRIS. Please provide one record for
+      each organisation identifier.
+    required:
+      - organisationExternalIdentifierType
+      - organisationExternalIdentifierValue
+    properties:
+      organisationExternalIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this organisation. Format:
+          Code Set | Organisation Identifier Type. 
+        example: '2'
+      organisationExternalID:
+        type: string
+        description: >-
+          The identifier value for this organisation. Enter the relevant value,
+          e.g. the NZBN, for the Organisation ID Type selected in 13.a.1.
+          Format: Text (max 256 characters)
+        example: '9429041920244'
+  OrganisationContributingOrganisation:
+    type: object
+    description: >-
+      This entity seeks information about the organisations identified as
+      contributing in relation to other entities within NZRIS. Please provide
+      one record for each contributing organisation.
+    required:
+      - localOrganisationID
+    properties:
+      localOrganisationID:
+        type: string
+        description: >-
+          The local identifier of an organisation which supplied resources to
+          establish or extend this organisation (e.g. infrastructure, staffing,
+          resources). An organisation contributes to another organisation if
+          they transfer assets to that organisation to increase the capability
+          of that organisation (e.g. gift infrastructure, supply staff). Needed
+          to understand the change in organisations over time. Format: Text (max
+          256 characters)
+      organisationIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify a contributing organisation.
+          Format: Code Set | Organisation Identifier Type
+        example: '2'
+      organisationID:
+        type: string
+        description: >-
+          The identifier of an organisation which supplied resources to
+          establish or extend this organisation (e.g. infrastructure, staffing,
+          resources). Enter the relevant value, e.g. the NZBN, for the
+          Organisation ID Type selected in 13.b.2. Format: Text (max 256
+          characters) 
+        example: '9429041920244'
+  OrganisationName:
+    type: object
+    description: >-
+      This entity seeks information about the names of organisations identified
+      in relation to other entities within NZRIS. Please provide one record for
+      each organisation name.
+    required:
+      - organisationNameType
+      - organisationNameValue
+    properties:
+      organisationNameType:
+        type: string
+        description: >-
+          The type of name used for this organisation. Allows for multiple names
+          to be stored and used for a single organisation. Format: Code Set |
+          Organisation Name Type
+        example: '1'
+      organisationNameValue:
+        type: string
+        description: >-
+          The name used for this organisation. Enter the relevant value for the
+          Organisation Name Type selected in 13.c.1. Format: Text (max 512
+          characters)
+      organisationNameStartDate:
+        type: string
+        format: date
+        description: >-
+          The date at which this name came into effect for this group. Enter the
+          relevant value for the Organisation Name Type selected in 13.c.1.
+          Format: Date: ISO 8601 (yyyy-mm-dd)
+      organisationNameEndDate:
+        type: string
+        format: date
+        description: >-
+          The date at which this name ceased to be used for this group. Needed
+          to enable NZRIS to identify the period over which a given name was in
+          effect. Format: Date: ISO 8601 (yyyy-mm-dd)  
+      organisationNameComment:
+        type: string
+        description: 'Supplementary information. Format: Text (max 512 characters)'
+  Group:
+    type: object
+    description: >-
+      The group entity seeks information about a group of people or
+      organisations identified in relation to other entities within NZRIS. When
+      a formal group of organisations and /or people is referenced in data
+      provided, the group identifier and name should be supplied. The group
+      purpose and external identifiers can also be supplied.
+    required:
+      - localGroupID
+      - groupName
+      - protectionRequirements
+    properties:
+      dataProviderId:
+        type: string
+        description: >-
+          The NZRIS identifier for the organisation submitting the record. This
+          identifier is supplied by the NZRIS administrator. Note - Will be
+          provided with submission. Returned here for convenience. Format:
+          Numeric: 3 digit
+      dataOwnerId:
+        type: string
+        description: >-
+          The NZRIS identifier for the person or organisation who owns the data,
+          where another organisation is submitting on their behalf. This
+          identifier is supplied by the NZRIS administrator. Conditional: For an
+          organisation submitting data for themselves, no data owner identifier
+          is required. For an organisation submitting data on behalf of another
+          organisation, the data owner identifier must be supplied. Format:
+          Numeric: 3 digit
+      localGroupID:
+        type: string
+        description: 'The local identifier for this group. Format: Text (max 256 characters)'
+      groupPurpose:
+        type: string
+        description: >-
+          The purpose for which the group is formed (e.g. Application Review
+          Panel). Format: Text (max 512 characters)
+        example: Application Review Panel
+      groupNames:
+        type: array
+        description: At least one name by which this group is known. Refer to 14.a
+        items:
+          $ref: '#/definitions/GroupName'
+        minItems: 1
+      groupIdentifiers:
+        type: array
+        description: Any additional identifier(s) used for this group. Refer to 14.b
+        items:
+          $ref: '#/definitions/GroupIdentifier'
+      protectionRequirements:
+        type: array
+        description: Protection requirements for record
+        items:
+          $ref: '#/definitions/ProtectionRequirement'
+        minItems: 1
+  GroupName:
+    type: object
+    description: >-
+      This entity seeks information about groups identified in relation to other
+      entities within NZRIS. Please provide at least one record for each group.
+    required:
+      - groupNameType
+      - groupNameValue
+    properties:
+      groupNameType:
+        type: string
+        description: >-
+          The type of name used for this group. Format: Code Set | Organisation
+          Name Type
+        example: '1'
+      groupNameValue:
+        type: string
+        description: >-
+          The name used for this group. Enter the relevant value for the Group
+          Name Type selected in 14.a.1. Format: Text (max 512 characters)
+      nameStartDate:
+        type: string
+        format: date
+        description: >-
+          The date on which this name first came into use. Format: Date: ISO
+          8601 (yyyy-mm-dd)
+      nameEndDate:
+        type: string
+        format: date
+        description: >-
+          The date on which this name ceased to be in use. Format: Date: ISO
+          8601 (yyyy-mm-dd)
+      groupNameComment:
+        type: string
+        description: 'Short additional comment. Format: Text (max 512 characters)'
+  GroupIdentifier:
+    type: object
+    description: >-
+      This entity seeks identifiers for groups identified in relation to other
+      entities within NZRIS. Please provide one record for each group.
+    required:
+      - groupIDType
+      - groupID
+    properties:
+      groupIDType:
+        type: string
+        description: >-
+          The type of identifier used to identify this group. Format: Code Set |
+          Organisation Identifier Type. 
+        example: '1'
+      groupID:
+        type: string
+        description: >-
+          The identifier value for this group. Enter the relevant value, e.g.
+          the NZBN, for the Group ID Type selected in 14.b.1. Format: Text (max
+          256 characters)
+  Codeset:
+    type: object
+    properties:
+      codesetid:
+        type: string
+      codesetname:
+        type: string
+      description:
+        type: string
+      version:
+        type: string
+      codes:
+        type: array
+        items:
+          $ref: '#/definitions/CodesetCode'
+  CodesetCode:
+    type: object
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+  ProtectionPattern:
+    type: object
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      patternType:
+        type: string
+      defaultExpiry:
+        type: string
+      applicability:
+        type: array
+        description: Data model entity types this pattern is directly applicable to
+        items:
+          type: string
+      transference:
+        type: array
+        description: >-
+          Data model entity types this pattern transfers to from a connected
+          entity
+        items:
+          type: string
+  ProtectionRequirement:
+    type: object
+    description: >-
+      Identification of the protection patterns to be applied to the record /
+      entity 
+    properties:
+      pattern:
+        type: string
+        description: >-
+          The protection pattern that should be applied to this data before
+          publication. Codeset | Protection Patterns
+      datePatternExpires:
+        type: string
+        format: date
+        description: >-
+          The date on which the protection pattern expires, and the data record
+          is publically available.  For those patterns that have an optional
+          expiry date. If no date is provided here, the default expiry period
+          for the pattern (as specified by NZRIS) will always be applied.
+  RSIElement:
+    type: object
+    description: Points to any record type
+    required:
+      - localId
+      - protectionRequirements
+    properties:
+      localId:
+        type: string
+      dataProviderId:
+        type: string
+      dataOwnerId:
+        type: string
+      entityType:
+        type: string
+  RecordSuppression:
+    type: object
+    properties:
+      ID:
+        type: string
+      timestamp:
+        type: string
+      decisionHistory:
+        type: array
+        items:
+          type: string
+      suppressedEntity:
+        type: array
+        description: Data model entities this pattern is directly applicable to
+        items:
+          $ref: '#/definitions/RSIElement'
+externalDocs:
+  description: Find out more about NZRIS and its specifications
+  url: >-
+    https://www.mbie.govt.nz/science-and-technology/science-and-innovation/research-and-data/nris/
