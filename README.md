@@ -6,6 +6,6 @@ Data needs to be submitted to the API in [JavaScript Object Notation (JSON)](htt
 
 ### The API definition can be viewed using the Swagger Editor
 The [Swagger Editor](https://editor.swagger.io/) provides a way to easily veiw Swagger YAML definitions. To view the definition for the NZRIS project:
-1. Go to [https://editor.swagger.io/].
+1. Go to https://editor.swagger.io/.
 2. Copy the text from the [API definition](https://raw.githubusercontent.com/new-zealand-research-information-system/nzris-api-specification/master/api-definition.yaml).
 3. Paste the copied text into the left hand side of the Swagger Editor.
