@@ -1,0 +1,774 @@
+{
+  "localSubmissionId": "string",
+  "localResubmissionId": "string",
+  "nzrisSubmissionId": "string",
+  "dataSubmissionContacts": "Joe.Bloggs@RSI.ac.nz",
+  "dataStartDate": "2019-07-21",
+  "dataEndDate": "2019-07-21",
+  "coverageIncluded": "string",
+  "coverageExcluded": "string",
+  "accuracyQuality": "includes GST, start date and end date are calculated.",
+  "standardCaveats": [
+    "This submission covers only publically funded research"
+  ],
+  "dataSources": [
+    {
+      "dataSource": "Finance Management System (FMS)",
+      "dataSourceDescription": "Holds information about financial transactions for research contracts",
+      "dateDataExtracted": "2019-05-06"
+    }
+  ],
+  "elements": {
+    "assetPools": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "establishmentDate": "string",
+        "disestablishmentDate": "string",
+        "purpose": "string",
+        "assetPoolName": [
+          {
+            "assetPoolName": "string",
+            "assetPoolNameType": "1",
+            "assetPoolNameStartDate": "string",
+            "assetPoolNameEndDate": "string",
+            "assetPoolNameComment": "string"
+          }
+        ],
+        "NZPublicSectorFinancialResource": [
+          {
+            "appropriation": "string",
+            "appropriationPeriod": "A",
+            "vote": "string",
+            "scope": "string",
+            "estimateType": "E",
+            "startYear": "string",
+            "endYear": "string",
+            "amount": "4000000.00"
+          }
+        ],
+        "otherResource": [
+          {
+            "supplierOrganisationType": "DA01",
+            "supplierOrganisationIndustry": "OO2",
+            "supplierOrganisationIDType": "2",
+            "supplierOrganisationID": "9429041920244",
+            "fundingPersonIDType": "2",
+            "fundingPersonID": "https://orcid.org/0000-0001-1111-1111",
+            "purpose": "string",
+            "scope": "string",
+            "resourceType": "D1",
+            "minimumResourceQuantity": "20000.00",
+            "maximumResourceQuantity": "40000.00",
+            "resourceMeasureCurrency": "1",
+            "resourceMeasureNonCurrency": "1",
+            "resourceValue": "20000.00",
+            "startDate": "string",
+            "endDate": "string"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "03"
+          },
+          {
+            "pattern": "04"
+          }
+        ]
+      }
+    ],
+    "plannedDistributions": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "localDistributionID": "string",
+        "distributionName": "MacGyver Fund 2016-18 Round",
+        "allocationMethod": "C",
+        "expectedAwardDeterminationDate": "string",
+        "distributionPeriod": [
+          {
+            "periodType": "CA",
+            "periodStartDate": "string",
+            "periodEndDate": "string",
+            "periodComment": "string"
+          }
+        ],
+        "resourcesToDistribute": [
+          {
+            "resourceType": "D1",
+            "minimumResourceQuantity": "2000000.00",
+            "maximumResourceQuantity": "4000000.00",
+            "resourceMeasureCurrency": "NZD",
+            "resourceMeasureNonCurrency": "10",
+            "resourceValue": "20000.00"
+          }
+        ],
+        "constraints": [
+          {
+            "constraintType": "1",
+            "constraint": "No more than 10% of award to be used for capital costs",
+            "constraintAdditionalInformation": "string"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "applications": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "localDistributionID": "string",
+        "localApplicationID": "string",
+        "priorLocalApplicationID": "string",
+        "applicationType": "I",
+        "applicationPhase": "S1",
+        "proposalTitle": "New model of sea temperatures",
+        "outcomeGoal": "string",
+        "applicantPersonIDType": "2",
+        "applicantPersonID": "https://orcid.org/0000-0001-1111-1111",
+        "applicantOrganisationIDType": "2",
+        "applicantOrganisationID": "9429041920244",
+        "submittingOrganisationIDType": "2",
+        "submittingOrganisationIDValue": "9429041920244",
+        "affiliatedOrganisationGroupID": "string",
+        "proposedPersonnel": [
+          {
+            "personIdentifierType": "2",
+            "personIdentifierValue": "https://orcid.org/0000-0001-1111-1111",
+            "role": "R1"
+          },
+          {
+            "personIdentifierType": "1",
+            "personIdentifierValue": "423356463",
+            "role": "R2"
+          }
+        ],
+        "requestedResource": [
+          {
+            "resourceType": "D1",
+            "minimumResourceQuantity": "200000.00",
+            "maximumResourceQuantity": "400000.00",
+            "resourceMeasureCurrency": "1",
+            "resourceMeasureNonCurrency": "1",
+            "resourceValue": "200000.00",
+            "startDate": "2019-07-21",
+            "endDate": "2019-07-21"
+          }
+        ],
+        "proposal": [
+          {
+            "localProposalID": "string",
+            "proposalTitle": "New model of sea temperatures"
+          }
+        ],
+        "ANZSRCTypeofActivityDistribution": [
+          {
+            "ANZSRCTypeOfActivity": "1",
+            "shareOfANZSRCTypeOfActivity": "0.9"
+          },
+          {
+            "ANZSRCTypeOfActivity": "2",
+            "shareOfANZSRCTypeOfActivity": "0.1"
+          }
+        ],
+        "ANZSRCFieldofResearchDistribution": [
+          {
+            "ANZSRCFieldOfResearch": "110309",
+            "shareOfANZSRCFieldOfResearch": "0.8"
+          },
+          {
+            "ANZSRCFieldOfResearch": "110310",
+            "shareOfANZSRCFieldOfResearch": "0.2"
+          }
+        ],
+        "ANZSRCSocioeconomicObjectiveDistribution": [
+          {
+            "ANZSRCSocioEconomicObjective": "920304",
+            "shareOfANZSRCSocioEconomicObjective": "0.6"
+          },
+          {
+            "ANZSRCSocioEconomicObjective": "920305",
+            "shareOfANZSRCSocioEconomicObjective": "0.2"
+          },
+          {
+            "ANZSRCSocioEconomicObjective": "920306",
+            "shareOfANZSRCSocioEconomicObjective": "0.2"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "03",
+            "datePatternExpires": "2023-02-01"
+          },
+          {
+            "pattern": "04",
+            "datePatternExpires": "2023-02-01"
+          }
+        ]
+      }
+    ],
+    "applicationReviews": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerID": "string",
+        "localApplicationID": "string",
+        "localReviewID": "string",
+        "assignmentDate": "2019-07-21",
+        "reviewDate": "2019-07-21",
+        "priorLocalReviewID": "string",
+        "reviewMethod": "1",
+        "reviewScore": "3",
+        "reviewScoreMinimum": "1",
+        "reviewScoreMaximum": "5",
+        "reviewOutcome": "1",
+        "reviewLocalGroupID": "string",
+        "hostOrganisationIDType": "2",
+        "hostOrganisationID": "9429041920244",
+        "reviewers": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111",
+            "leadReviewerFlag": "Y",
+            "reviewScore": "3",
+            "reviewScoreMinimum": "1",
+            "reviewScoreMaximum": "5"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "applicationDecisions": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localApplicationID": "string",
+        "localDecisionID": "string",
+        "priorLocalDecisionID": "string",
+        "decisionDate": "string",
+        "decision": "1",
+        "additionalInformation": "string",
+        "decisionLocalGroupID": "string",
+        "decisionMakers": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111",
+            "leadDecisionMakerFlag": "Yes"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "awardsGranted": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "localDistributionID": "string",
+        "localApplicationID": "string",
+        "localAwardID": "string",
+        "parentLocalAwardID": "string",
+        "localContractID": "string",
+        "parentLocalContractID": "string",
+        "awardTitle": "string",
+        "awardDescription": "string",
+        "awardStartDate": "2019-07-21",
+        "awardEndDate": "2019-07-21",
+        "awardStatus": "string",
+        "awardType": "string",
+        "assetPoolRecipientIDType": "1",
+        "assetPoolRecipientID": "string",
+        "individualRecipientIDType": "1",
+        "individualRecipientID": "string",
+        "awardOrganisation": [
+          {
+            "organisationIDType": "2",
+            "organisationID": "9429041920244",
+            "organisationRole": "1"
+          }
+        ],
+        "agreedPersonnel": [
+          {
+            "personIDType": "2",
+            "personIDValue": "https://orcid.org/0000-0001-1111-1111",
+            "role": "R1",
+            "localRoleDescription": "Lead Researcher"
+          }
+        ],
+        "allocatedResource": [
+          {
+            "localResourceID": "string",
+            "resourceType": "D1",
+            "minimumResourceQuantity": "string",
+            "maximumResourceQuantity": "400000.00",
+            "resourceMeasureCurrency": "1",
+            "resourceMeasureNonCurrency": "1",
+            "resourceValue": "200000.00",
+            "startDate": "2019-07-21",
+            "endDate": "2019-07-21",
+            "constraints": [
+              {
+                "constraintType": "01",
+                "resourceConstraint": "Requires for 50% matching awards from other organisations"
+              },
+              {
+                "constraintType": "03",
+                "resourceConstraint": "Maximum 10% administrative utilisation"
+              },
+              {
+                "constraintType": "04",
+                "resourceConstraint": "No capital purchases"
+              },
+              {
+                "constraintType": "99",
+                "resourceConstraint": "Requirement for open data access"
+              }
+            ]
+          }
+        ],
+        "ANZSRCTypeofActivityDistribution": [
+          {
+            "ANZSRCTypeOfActivity": "1",
+            "shareOfANZSRCTypeOfActivity": "0.5"
+          }
+        ],
+        "ANZSRCFieldofResearchDistribution": [
+          {
+            "ANZSRCFieldOfResearch": "060101",
+            "shareOfANZSRCFieldOfResearch": "0.5"
+          }
+        ],
+        "ANZSRCSocioeconomicObjectiveDistribution": [
+          {
+            "ANZSRCSocioEconomicObjective": "820101",
+            "shareOfANZSRCSocioEconomicObjective": "0.5"
+          }
+        ],
+        "publicSectorResearchAlignment": [
+          {
+            "publicSectorResearchAlignment": "1",
+            "themePriorityOrProgrammeCoRE": "100",
+            "themePriorityOrProgrammeNSC": "100",
+            "themePriorityOrProgrammeHRC": "100",
+            "themePriorityOrProgrammeMPI": "100",
+            "themePriorityOrProgrammeVisionMatauranga": "100",
+            "shareOfTheme": "1"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "resourcesDistributed": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "localAwardID": "string",
+        "localContractID": "string",
+        "localResourceDistributedID": "2",
+        "distributingOrganisationIDType": "2",
+        "distributingOrganisationID": "9429041920244",
+        "awardType": "O",
+        "recipientIDTypeOrganisation": "2",
+        "recipientIDTypeIndividual": "2",
+        "recipientIDTypeAssetPool": "Local ID",
+        "recipientID": "9429041920244",
+        "resourceType": "D1",
+        "resourceActualQuantity": "4000000.00",
+        "resourceMeasureCurrency": "1",
+        "resourceMeasureNonCurrency": "1",
+        "resourceValue": "4000000.00",
+        "distributionBasis": "1",
+        "distributionStartDate": "2019-07-21",
+        "distributionEndDate": "2019-07-21",
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "parentProjectLocalID": "string",
+        "localProjectID": "string",
+        "projectTitle": "string",
+        "projectDescription": "string",
+        "keywords": [
+          "string"
+        ],
+        "projectStartDate": "2019-07-21",
+        "projectEndDate": "2019-07-21",
+        "projectStatus": "1",
+        "benefitingRegions": [
+          "01",
+          "02",
+          "03"
+        ],
+        "projectTypeUtilisation": [
+          {
+            "projectType": "RD",
+            "shareOfProjectType": "1"
+          }
+        ],
+        "ANZSRCTypeOfActivityDistribution": [
+          {
+            "ANZSRCTypeOfActivity": "1",
+            "shareOfANZSRCTypeOfActivity": "0.5"
+          }
+        ],
+        "ANZSRCFieldOfResearchDistribution": [
+          {
+            "ANZSRCFieldOfResearch": "060101",
+            "shareOfANZSRCFieldOfResearch": "0.5"
+          }
+        ],
+        "ANZSRCSocioEconomicObjectiveDistribution": [
+          {
+            "ANZSRCSocioEconomicObjective": "820101",
+            "shareOfANZSRCSocioEconomicObjective": "0.5"
+          }
+        ],
+        "publicSectorResearchAlignment": [
+          {
+            "publicSectorResearchAlignment": "1",
+            "themePriorityOrProgrammeCoRE": "100",
+            "themePriorityOrProgrammeNSC": "100",
+            "themePriorityOrProgrammeHRC": "100",
+            "themePriorityOrProgrammeMPI": "100",
+            "themePriorityOrProgrammeVisionMatauranga": "100",
+            "shareOfTheme": "1"
+          }
+        ],
+        "projectPersonnel": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111",
+            "personnelRole": "R1",
+            "startDate": "2019-07-21",
+            "endDate": "2019-07-21",
+            "FTEAllocation": "0.2",
+            "localRoleDescription": "Lead Researcher"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "awardsReceived": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "assetPoolName": "string",
+        "parentLocalAwardID": "string",
+        "localAwardID": "string",
+        "localContractID": "string",
+        "localProjectID": [
+          "string"
+        ],
+        "awardTitle": "Endeavour Fund Asset Pool award to Research Programmes Asset Pool",
+        "awardDescription": "string",
+        "subjectToOpenContestability": "Yes",
+        "awardStartDate": "2019-07-21",
+        "awardEndDate": "2019-07-21",
+        "awardStatus": "1",
+        "awardType": "1",
+        "organisations": [
+          {
+            "organisationIDType": "2",
+            "organisationID": "9429041920244",
+            "organisationRole": "1"
+          }
+        ],
+        "agreedPersonnel": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111",
+            "role": "R1",
+            "localRoleDescription": "Lead Researcher"
+          }
+        ],
+        "allocatedResources": [
+          {
+            "localResourceID": "string",
+            "resourceType": "D1",
+            "minimumResourceQuantity": "string",
+            "maximumResourceQuantity": "400000.00",
+            "resourceMeasureCurrency": "1",
+            "resourceMeasureNonCurrency": "1",
+            "resourceValue": "200000.00",
+            "startDate": "2019-07-21",
+            "endDate": "2019-07-21",
+            "constraints": [
+              {
+                "constraintType": "01",
+                "resourceConstraint": "Requires for 50% matching awards from other organisations"
+              },
+              {
+                "constraintType": "03",
+                "resourceConstraint": "Maximum 10% administrative utilisation"
+              },
+              {
+                "constraintType": "04",
+                "resourceConstraint": "No capital purchases"
+              },
+              {
+                "constraintType": "99",
+                "resourceConstraint": "Requirement for open data access"
+              }
+            ]
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ],
+        "AssetPoolRecipientIDType": "1",
+        "AssetPoolRecipientID": "1",
+        "IndividualRecipientIDType": "1",
+        "IndividualRecipientID": "1"
+      }
+    ],
+    "resourcesReceived": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localAssetPoolID": "string",
+        "localAwardID": "string",
+        "localContractID": "string",
+        "localResourceReceivedID": "string",
+        "distributingOrganisationIDType": "2",
+        "distributingOrganisationID": "9429041920244",
+        "awardType": "1",
+        "recipientIDTypeOrganisation": "2",
+        "recipientIDTypeIndividual": "2",
+        "recipientIDTypeAssetPool": "2",
+        "recipientID": "9429041920244",
+        "resourceType": "D1",
+        "resourceActualQuantity": "200000.00",
+        "resourceMeasureCurrency": "1",
+        "resourceMeasureNonCurrency": "1",
+        "resourceValue": "200000.00",
+        "distributionBasis": "1",
+        "distributionStartDate": "2019-07-21",
+        "distributionEndDate": "2019-07-21",
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "ORCIDoutputType": "journal-article",
+        "TECoutputType": "string",
+        "outputLanguage": "eng",
+        "localOutputType": "Peer Review Research Journal Article",
+        "outputTitle": "string",
+        "accessType": "O",
+        "productionDate": "2019-07-21",
+        "outputDescription": "string",
+        "localProjectIDs": [
+          "string"
+        ],
+        "contributors": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111"
+          }
+        ],
+        "identifiers": [
+          {
+            "outputIDType": "100",
+            "outputID": "1500818100"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "persons": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localPersonId": "string",
+        "givenName": "string",
+        "otherGivenNames": [
+          "string"
+        ],
+        "familyName": "string",
+        "dateOfBirth": "2019-07-21",
+        "gender": "string",
+        "priorLocalPersonID": "string",
+        "genderOtherInformation": "string",
+        "ethnicity": [
+          "string"
+        ],
+        "iwiAffiliation": [
+          "0100"
+        ],
+        "sectorPersonIds": [
+          {
+            "personIDType": "2",
+            "personID": "https://orcid.org/0000-0001-1111-1111"
+          }
+        ],
+        "researchCareerStage": [
+          {
+            "careerStage": "R1",
+            "yearAchieved": "1999"
+          }
+        ],
+        "academicRecord": [
+          {
+            "academicQualification": "10",
+            "dateConferred": "2019-07-21",
+            "discipline": "010101",
+            "awardingInstitution": "string",
+            "researchTopic": "string",
+            "researchStartYear": "1996"
+          }
+        ],
+        "recognition": [
+          {
+            "prestigiousPrizeOrMedal": "string",
+            "awardingInstitution": "string",
+            "amount": "string",
+            "yearOfRecognition": "1999"
+          }
+        ],
+        "professionalBodies": [
+          {
+            "professionalMembership": "string",
+            "organisationIDType": "2",
+            "organisationID": "9429041920244",
+            "professionalQualification": "string"
+          }
+        ],
+        "organisationAffiliations": [
+          {
+            "organisationIDType": "02",
+            "organisationID": "9429041920244",
+            "localRoleDescription": "string"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "organisations": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localOrganisationID": "string",
+        "organisationType": "string",
+        "priorLocalOrganisationID": "string",
+        "parentOrganisationIDType": "2",
+        "parentOrganisationID": "9429041920244",
+        "dateOfEstablishment": "2019-07-21",
+        "dateOfDisestablishment": "2019-07-21",
+        "organisationIdentifiers": [
+          {
+            "organisationExternalIDType": "2",
+            "organisationExternalID": "9429041920244"
+          }
+        ],
+        "contributingOrganisations": [
+          {
+            "localOrganisationID": "string",
+            "organisationIDType": "2",
+            "organisationID": "9429041920244"
+          }
+        ],
+        "organisationNames": [
+          {
+            "organisationNameType": "1",
+            "organisationNameValue": "string",
+            "organisationNameStartDate": "2019-07-21",
+            "organisationNameEndDate": "2019-07-21",
+            "organisationNameComment": "string"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "dataProviderId": "string",
+        "dataOwnerId": "string",
+        "localGroupID": "string",
+        "groupPurpose": "Application Review Panel",
+        "groupNames": [
+          {
+            "groupNameType": "1",
+            "groupNameValue": "string",
+            "nameStartDate": "2019-07-21",
+            "nameEndDate": "2019-07-21",
+            "groupNameComment": "string"
+          }
+        ],
+        "groupIdentifiers": [
+          {
+            "groupIDType": "1",
+            "groupID": "string"
+          }
+        ],
+        "protectionRequirements": [
+          {
+            "pattern": "string",
+            "datePatternExpires": "2019-07-21"
+          }
+        ]
+      }
+    ]
+  }
+}
