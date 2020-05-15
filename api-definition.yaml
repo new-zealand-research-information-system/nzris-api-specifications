@@ -1,64 +1,42 @@
 swagger: '2.0'
 info:
+  title: NZRIS Data Provider API
+  version: '2.03'
   description: >-
-    NZRIS Data provider API.  You can find out more about     NZRIS at TBC
-    [https://nzris.org.nz](https://www.mbie.govt.nz/info-services/science-innovation/research-and-data/nris/in-detail). 
+    NZRIS Data provider API. You can find out more about NZRIS at TBC
+    [https://nzris.org.nz](https://www.mbie.govt.nz/info-services/science-innovation/research-and-data/nris/in-detail).
     <br>All URLs here would be prefixed as per the baseURL above e.g.
     http://provider-api.nzris.org.nz/services/v1 and vary depending on test
     environments. <br/>Major version increments will be breaking, minor not,
     before go live it will be set to 1 in path with more detail in header.
-  version: '2.0'
-  title: NZRIS Data Provider API
   termsOfService: 'http://nzris.org.nz/provider-api/terms/'
   contact:
     email: nzris@mbie.govt.nz
 basePath: /services/v2.0
-consumes:
-  - application/json
-produces:
-  - application/json
-tags:
-  - name: dataprovider
-    description: Data Provider current registration
-    externalDocs:
-      description: Find out more at
-      url: 'http://nzris.org.nz/provider-api/overview/'
-  - name: submission
-    description: >-
-      Submission Bulk Operations for creating a new submission or accessing the
-      entire submission collection
-    externalDocs:
-      description: Find out more TBC
-      url: 'http://nzris.org.nz/provider-api/overview/'
-  - name: element
-    description: Operations for accessing individual elements inside a submission
-    externalDocs:
-      description: Find out more TBC
-      url: 'http://nzris.org.nz/provider-api/overview/'
-  - name: reference
-    description: Operations for accessing reference data
-    externalDocs:
-      description: Find out more TBC
-      url: 'http://nzris.org.nz/provider-api/overview/'
-  - name: suppression
-    description: Operations for accessing records suppressed due to user feedback
-    externalDocs:
-      description: Find out more TBC
-      url: 'http://nzris.org.nz/provider-api/overview/'
 schemes:
   - https
+securityDefinitions:
+  apiKeyHeader:
+    type: apiKey
+    name: Ocp-Apim-Subscription-Key
+    in: header
+  apiKeyQuery:
+    type: apiKey
+    name: subscription-key
+    in: query
+security:
+  - apiKeyHeader: []
+  - apiKeyQuery: []
 paths:
   /echoString/:
     post:
-      tags:
-        - dataprovider
-      summary: Echo to validate connectivity
       description: >-
         Returns an echo, if successfully connected and authorised as a API
         consumer
       operationId: echoString
-      produces:
-        - application/json
+      summary: Echo to validate connectivity
+      tags:
+        - dataprovider
       parameters:
         - name: echoString
           in: query
@@ -70,21 +48,20 @@ paths:
         '200':
           description: successful operation
           schema:
-            type: string
-            example: echo123
-      security:
-        - api_key: []
-  '/dataprovider/{dataProviderId}':
-    get:
-      tags:
-        - dataprovider
-      summary: Read dataprovider configuration
-      description: >-
-        Returns the configuration for the data provider, if authorised, thereby
-        also confirming authentication filter access to dataprovider. 
-      operationId: getDataProviderById
+            $ref: '#/definitions/EchoStringPost200ApplicationJsonResponse'
+          examples:
+            application/json: echo123
       produces:
         - application/json
+  '/dataprovider/{dataProviderId}':
+    get:
+      description: >-
+        Returns the configuration for the data provider, if authorised, thereby
+        also confirming authentication filter access to dataprovider.
+      operationId: getDataProviderById
+      summary: Read dataprovider configuration
+      tags:
+        - dataprovider
       parameters:
         - name: dataProviderId
           in: path
@@ -100,31 +77,38 @@ paths:
           description: Invalid ID supplied
         '404':
           description: Data provider not found
-      security:
-        - api_key: []
-  '/submissions/{submissionId}':
-    post:
-      tags:
-        - submission
-      summary: Create a new Submission
-      description: >-
-        Create a new data submission and its dataset, kicking off a new workflow
-        to have it reviewed and approved (or auto approved). Note that the submissionId provided is assumed to be a localSubmissionId specific to the data provider - NZRIS will generate an NZRISSubmissionId and version number which should be used to reference this submission subsequently. 
-      operationId: createSubmission
       produces:
         - application/json
+  '/submissions/{submissionId}':
+    post:
+      description: >-
+        Create a new data submission and its dataset, kicking off a new workflow
+        to have it reviewed and approved (or auto approved). Note that the
+        submissionId provided is assumed to be a localSubmissionId specific to
+        the data provider - NZRIS will generate an NZRISSubmissionId and version
+        number which should be used to reference this submission subsequently.
+      operationId: createSubmission
+      summary: Create a new Submission
+      tags:
+        - submission
       parameters:
         - name: submissionId
           in: path
-          description: The localId of the submission being made - specific to each data provider. NZRIS will generate an NZRISSubmissionId and version number for each submission during the submission validation process. Note that subsequent create operations with the same localSubmissionId will be rejected.
+          description: >-
+            The localId of the submission being made - specific to each data
+            provider. NZRIS will generate an NZRISSubmissionId and version
+            number for each submission during the submission validation process.
+            Note that subsequent create operations with the same
+            localSubmissionId will be rejected.
           required: true
           type: string
-        - name: Submission
+        - name: submission
           in: body
-          description: Submission dataset
-          required: true
           schema:
             $ref: '#/definitions/Submission'
+          description: Submission dataset
+      consumes:
+        - application/json
       responses:
         '200':
           description: successful operation
@@ -134,28 +118,27 @@ paths:
           description: Invalid submissionId supplied
         '404':
           description: Submission not found
-      security:
-        - api_key: []
-    put:
-      tags:
-        - submission
-      summary: Update entire Submission dataset
-      description: 'Update entire Submission dataset, removing what is not mentioned'
-      operationId: updateSubmissionFull
       produces:
         - application/json
+    put:
+      description: 'Update entire Submission dataset, removing what is not mentioned'
+      operationId: updateSubmissionFull
+      summary: Update entire Submission dataset
+      tags:
+        - submission
       parameters:
         - name: submissionId
           in: path
           description: ID of submission
           required: true
           type: string
-        - name: Submission
+        - name: submission
           in: body
-          description: Submission dataset
-          required: true
           schema:
             $ref: '#/definitions/Submission'
+          description: Submission dataset
+      consumes:
+        - application/json
       responses:
         '200':
           description: successful operation
@@ -165,19 +148,17 @@ paths:
           description: Invalid submissionId supplied
         '404':
           description: Submission not found
-      security:
-        - api_key: []
+      produces:
+        - application/json
     get:
-      tags:
-        - submission
-      summary: Read Submission metadata and elements
       description: >-
         Read Submission metadata and elements by submission ID. Note To see the
         submissions for a dataprovider see
         /dataprovider/{dataproviderID}/submissions
       operationId: getSubmissionById
-      produces:
-        - application/json
+      summary: Read Submission metadata and elements
+      tags:
+        - submission
       parameters:
         - name: submissionId
           in: path
@@ -193,17 +174,16 @@ paths:
           description: Invalid submissionId supplied
         '404':
           description: Submission not found
-      security:
-        - api_key: []
+      produces:
+        - application/json
     delete:
-      tags:
-        - submission
-      summary: Submission abort
       description: >-
         Aborts the approval workflow for a data submission if the submission
-        workflow is still active. 
-        /submissions/{submissionId}/deleteall:
+        workflow is still active.  /submissions/{submissionId}/deleteall:
       operationId: abortSubmissionById
+      summary: Submission abort
+      tags:
+        - submission
       parameters:
         - name: submissionId
           in: path
@@ -217,13 +197,10 @@ paths:
           description: Invalid submissionId supplied
         '404':
           description: Submission not found
-      security:
-        - api_key: []
+      produces:
+        - application/json
   '/submissions/{submissionId}/elementsreplace/':
     put:
-      tags:
-        - submission
-      summary: 'Update entities in Submission dataset, merge with existing.'
       description: >-
         Update or add entities in Submission dataset, will not remove. Will add
         or update as required, can be one or many elements. For individual
@@ -231,22 +208,24 @@ paths:
         /submissions/{submissionId}/element/{elementType}. For deleting all
         removed items in bulk use PUT /submissions/{submissionId}. This
         operation is needed as many frameworks have limited support for PATCH in
-        standard format. 
+        standard format.
       operationId: updateSubmissionEntityReplace
-      produces:
-        - application/json
+      summary: 'Update entities in Submission dataset, merge with existing.'
+      tags:
+        - submission
       parameters:
         - name: submissionId
           in: path
           description: ID of existing data provider submission
           required: true
           type: string
-        - name: Submission
+        - name: submission
           in: body
-          description: Submission dataset
-          required: true
           schema:
             $ref: '#/definitions/Submission'
+          description: Submission dataset
+      consumes:
+        - application/json
       responses:
         '200':
           description: successful operation
@@ -256,72 +235,58 @@ paths:
           description: Invalid ID supplied
         '404':
           description: Submission not found
-      security:
-        - api_key: []
-  /references/codesets/:
-    get:
-      tags:
-        - reference
-      summary: Read available codeset(s)
-      description: >-
-        Read available codesets optionally filtering for specific codeset and
-        version. In scope? 
-      operationId: getREferenceCodesetsAll
       produces:
         - application/json
+  /references/codesets/:
+    get:
+      description: >-
+        Read available codesets optionally filtering for specific codeset and
+        version. In scope?
+      operationId: getREferenceCodesetsAll
+      summary: Read available codeset(s)
+      tags:
+        - reference
       parameters:
         - name: codesetname
           in: query
           description: Name of codeset(s) to return
-          required: false
           type: string
         - name: codesetversion
           in: query
           description: Version of codeset(s) to return
-          required: false
           type: string
       responses:
         '200':
           description: successful operation
           schema:
-            type: array
-            description: Related available codesets
-            items:
-              $ref: '#/definitions/Codeset'
+            $ref: '#/definitions/CodesetArray'
         '400':
           description: Invalid ID supplied
         '404':
           description: Data provider not found
-      security:
-        - api_key: []
-  /references/protection/:
-    get:
-      tags:
-        - reference
-      summary: Read Protection Patterns available
-      description: 'Read Protection Patterns available. In scope? '
-      operationId: getProtectionPatternsAll
       produces:
         - application/json
+  /references/protection/:
+    get:
+      description: 'Read Protection Patterns available. In scope? '
+      operationId: getProtectionPatternsAll
+      summary: Read Protection Patterns available
+      tags:
+        - reference
       responses:
         '200':
           description: successful operation
           schema:
-            type: array
-            description: All currently available Protection Patterns
-            items:
-              $ref: '#/definitions/ProtectionPattern'
-      security:
-        - api_key: []
-  '/suppressions/{dataproviderID}/':
-    get:
-      tags:
-        - suppression
-      summary: List records suppressed for data provider
-      description: List records suppressed for data provider due to user feedback
-      operationId: getDataProviderSuppressedRecords
+            $ref: '#/definitions/ProtectionPatternArray'
       produces:
         - application/json
+  '/suppressions/{dataproviderID}/':
+    get:
+      description: List records suppressed for data provider due to user feedback
+      operationId: getDataProviderSuppressedRecords
+      summary: List records suppressed for data provider
+      tags:
+        - suppression
       parameters:
         - name: dataproviderID
           in: path
@@ -332,43 +297,21 @@ paths:
         '200':
           description: successful operation
           schema:
-            type: array
-            description: All currently suppressed records for data provider
-            items:
-              $ref: '#/definitions/RecordSuppression'
-      security:
-        - api_key: []
-securityDefinitions:
-  basic_auth:
-    type: basic
-  api_key:
-    type: apiKey
-    name: api_key
-    in: header
+            $ref: '#/definitions/RecordSuppressionArray'
+      produces:
+        - application/json
 definitions:
   DataProvider:
     type: object
     required:
       - dataProviderId
-      - name
-      - status
     properties:
       dataProviderId:
         type: string
         example: MBIE
-      name:
-        type: string
-        example: 'Ministry of Business, Innovation and Employment'
       autoApproval:
         type: string
         description: Whether auto-approval is setup for this data provider
-      status:
-        type: string
-        description: Data provider status
-        enum:
-          - active
-          - pending
-          - disabled
       trustedCustodianLogins:
         type: array
         description: Logins granted custodian role
@@ -393,7 +336,7 @@ definitions:
       made with any number of data row/entity up to a full report for a period.
       Submission metadata must accompany each submission. This metadata is used
       to assess quality and coverage and then communicate it to website
-      users.      
+      users.
     required:
       - localSubmissionId
       - dataProviderId
@@ -404,6 +347,9 @@ definitions:
       - dataEndDate
       - elements
     properties:
+      dataProviderId:
+        type: string
+        example: MBIE
       localSubmissionId:
         type: string
         description: >-
@@ -414,12 +360,11 @@ definitions:
       localResubmissionId:
         type: string
         description: >-
-          The local submission ID for the submitted data this submission
-          will replace (deprecated do not use)
+          The local submission ID for the submitted data this submission will
+          replace (deprecated do not use)
       nzrisSubmissionId:
         type: string
-        description: >-
-          The NZRIS submission ID - this will be generated by NZRIS.
+        description: The NZRIS submission ID - this will be generated by NZRIS.
       dataSubmissionContacts:
         type: string
         description: >-
@@ -454,8 +399,8 @@ definitions:
           Standard Caveats
         items:
           type: string
-          example: 'This submission covers only publically funded research'
-      dataSources: 
+          example: This submission covers only publically funded research
+      dataSources:
         type: array
         items:
           $ref: '#/definitions/DataSource'
@@ -467,7 +412,7 @@ definitions:
     description: The sources of data in this submission
     required:
       - dataSource
-      - dataSourceDescription
+      - dateDataExtracted
     properties:
       dataSource:
         type: string
@@ -481,7 +426,7 @@ definitions:
         type: string
         format: date
         description: The date the data has been extracted from the source (optional)
-        example: "2019-05-06"
+        example: '2019-05-06'
   RSIElementCollection:
     type: object
     description: Can contain one or more of any and all entity types simultaneously
@@ -557,13 +502,6 @@ definitions:
       - assetPoolName
       - protectionrequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -588,7 +526,7 @@ definitions:
         type: string
         description: >-
           The date the asset pool was disestablished. Format: date: ISO 8601
-          (yyyy.mm.dd) 
+          (yyyy.mm.dd)
       purpose:
         type: string
         description: >-
@@ -599,7 +537,7 @@ definitions:
         type: array
         description: >-
           The name or title of the asset pool (e.g. fund or scheme). Refer to
-          1.a 
+          1.a
         items:
           $ref: '#/definitions/AssetPoolName'
         minItems: 1
@@ -871,20 +809,13 @@ definitions:
       of resources) can supply the following information to NZRIS to describe
       their process. An asset pool which negotiates awards on an irregular basis
       may not need to supply this information or may set up a single planned
-      distribution for the expected lifespan of the asset pool.  
+      distribution for the expected lifespan of the asset pool.
     required:
       - localAssetPoolID
       - localDistributionID
       - allocationMethod
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -955,7 +886,7 @@ definitions:
       This entity seeks information about the timing of the activities required
       to distribute resources for the asset pool (for example, call for
       applications, review, and notification of award). Please provide a record
-      for each relevant activity. 
+      for each relevant activity.
     required:
       - periodType
       - periodStartDate
@@ -1076,13 +1007,6 @@ definitions:
       - applicationPhase
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -1347,7 +1271,7 @@ definitions:
           The measure of the non-currency resource being supplied. Conditional:
           Provide if Resource Type selected in 3.b.1 is Infrastructure Resource
           (I1), FTE Resource (I2) or Other Resource (I3). Format: Code Set |
-          Resource Measure - Non-Currency 
+          Resource Measure - Non-Currency
         example: '1'
       resourceValue:
         type: string
@@ -1487,7 +1411,7 @@ definitions:
     type: object
     description: >-
       The application review entity seeks information about the people involved
-      in reviewing applications for resources and the outcomes of reviews. 
+      in reviewing applications for resources and the outcomes of reviews.
     required:
       - localApplicationID
       - localReviewID
@@ -1495,13 +1419,6 @@ definitions:
       - reviewMethod
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format
-          Numeric 3 digit
       dataOwnerID:
         type: string
         description: >-
@@ -1610,8 +1527,8 @@ definitions:
       resources from the asset pool. Please provide one record for each
       reviewer.
     required:
-      - personIdentifierType
-      - personIdentifierValue
+      - personIDType
+      - personID
       - leadReviewerFlag
     properties:
       personIDType:
@@ -1664,13 +1581,6 @@ definitions:
       - decision
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format
-          Numeric 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -1739,8 +1649,8 @@ definitions:
       applications and their roles. Please provide one record for each
       decision-maker.
     required:
-      - personIdentifierType
-      - personIdentifierValue
+      - personIDType
+      - personID
       - leadDecisionMakerFlag
     properties:
       personIDType:
@@ -1781,13 +1691,6 @@ definitions:
       - awardOrganisation
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -2016,7 +1919,7 @@ definitions:
           The type of identifier used to identify the person. Format: Code Set |
           Person Identifier Type
         example: '2'
-      personIDValue:
+      personID:
         type: string
         description: >-
           The identifier value for the person. Enter the relevant value, e.g.
@@ -2248,6 +2151,7 @@ definitions:
       provide one record for each priority, theme or programme.
     required:
       - shareOfTheme
+      - publicSectorResearchAlignment
     properties:
       publicSectorResearchAlignment:
         type: string
@@ -2332,14 +2236,8 @@ definitions:
       - distributionStartDate
       - distributionEndDate
       - protectionRequirements
+      - awardType
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here forconvenience. Format Numeric
-          3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -2497,14 +2395,8 @@ definitions:
       - projectTypeUtilisation
       - projectPersonnel
       - protectionRequirements
+      - localProjectID
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format 
-          Numeric 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -2771,13 +2663,6 @@ definitions:
       - protectionRequirements
       - awardType
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -3078,7 +2963,7 @@ definitions:
         format: date
         description: >-
           The agreed end of the period of use of the resources. Format: Date:
-          ISO 8601 (yyyy-mm-dd)    
+          ISO 8601 (yyyy-mm-dd)
   ResourceReceived:
     type: object
     description: >-
@@ -3088,7 +2973,7 @@ definitions:
       a project, the asset pool distributing the resources, and the actual
       resources supplied. The resources involved may be either received from an
       asset pool by an award recipient, or returned by an award recipient to the
-      asset pool (e.g. return of unused funds). 
+      asset pool (e.g. return of unused funds).
     required:
       - localAssetPoolID
       - distributingOrganisationIDType
@@ -3103,13 +2988,6 @@ definitions:
       - localResourceReceivedID
       - awardType
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -3138,7 +3016,7 @@ definitions:
         type: string
         description: >-
           The local identifier for this resource once received. Format: Text
-          (max 256 characters) 
+          (max 256 characters)
       distributingOrganisationIDType:
         type: string
         description: >-
@@ -3279,13 +3157,6 @@ definitions:
       - identifiers
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -3381,7 +3252,7 @@ definitions:
     type: object
     description: >-
       This entity seeks information about contributors to the project’s outputs.
-      Please provide one record for each contributor. 
+      Please provide one record for each contributor.
     required:
       - personIDType
       - personID
@@ -3450,13 +3321,6 @@ definitions:
       - givenName
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -3534,7 +3398,7 @@ definitions:
           2 or Level 4 Code Set | Ethnicity Classification. Example 31
         items:
           type: string
-          maxItems: 3
+          maxItems: 6
       iwiAffiliation:
         type: array
         description: >-
@@ -3550,6 +3414,7 @@ definitions:
           Classification
         items:
           type: string
+          maxItems: 6
         example:
           - '0100'
       sectorPersonIds:
@@ -3766,7 +3631,7 @@ definitions:
         description: >-
           The type of identifier used to identify this organisation with whom
           the person holds the specified role. Format: Code Set | Organisation
-          Identifier Type (section 11.4). 
+          Identifier Type (section 11.4).
         example: '02'
       organisationID:
         type: string
@@ -3803,13 +3668,6 @@ definitions:
       - organisationName
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for  convenience. Format 
-          Numeric 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -3902,14 +3760,14 @@ definitions:
       relation to other entities within NZRIS. Please provide one record for
       each organisation identifier.
     required:
-      - organisationExternalIdentifierType
-      - organisationExternalIdentifierValue
+      - organisationExternalIDType
+      - organisationExternalID
     properties:
       organisationExternalIDType:
         type: string
         description: >-
           The type of identifier used to identify this organisation. Format:
-          Code Set | Organisation Identifier Type. 
+          Code Set | Organisation Identifier Type.
         example: '2'
       organisationExternalID:
         type: string
@@ -3950,7 +3808,7 @@ definitions:
           establish or extend this organisation (e.g. infrastructure, staffing,
           resources). Enter the relevant value, e.g. the NZBN, for the
           Organisation ID Type selected in 13.b.2. Format: Text (max 256
-          characters) 
+          characters)
         example: '9429041920244'
   OrganisationName:
     type: object
@@ -3988,7 +3846,7 @@ definitions:
         description: >-
           The date at which this name ceased to be used for this group. Needed
           to enable NZRIS to identify the period over which a given name was in
-          effect. Format: Date: ISO 8601 (yyyy-mm-dd)  
+          effect. Format: Date: ISO 8601 (yyyy-mm-dd)
       organisationNameComment:
         type: string
         description: 'Supplementary information. Format: Text (max 512 characters)'
@@ -4005,13 +3863,6 @@ definitions:
       - groupName
       - protectionRequirements
     properties:
-      dataProviderId:
-        type: string
-        description: >-
-          The NZRIS identifier for the organisation submitting the record. This
-          identifier is supplied by the NZRIS administrator. Note - Will be
-          provided with submission. Returned here for convenience. Format:
-          Numeric: 3 digit
       dataOwnerId:
         type: string
         description: >-
@@ -4096,7 +3947,7 @@ definitions:
         type: string
         description: >-
           The type of identifier used to identify this group. Format: Code Set |
-          Organisation Identifier Type. 
+          Organisation Identifier Type.
         example: '1'
       groupID:
         type: string
@@ -4153,13 +4004,22 @@ definitions:
     type: object
     description: >-
       Identification of the protection patterns to be applied to the record /
-      entity 
+      entity
+    required:
+      - pattern
+      - datePatternExpires
+      - ProtectionExpiration
     properties:
       pattern:
         type: string
         description: >-
           The protection pattern that should be applied to this data before
           publication. Codeset | Protection Patterns
+      ProtectionExpiration:
+        type: string
+        description: >-
+          Whether the protection pattern will expire, or is indefinite. Text:
+          Boolean (Yes / No)
       datePatternExpires:
         type: string
         format: date
@@ -4199,7 +4059,49 @@ definitions:
         description: Data model entities this pattern is directly applicable to
         items:
           $ref: '#/definitions/RSIElement'
-externalDocs:
-  description: Find out more about NZRIS and its specifications
-  url: >-
-    https://www.mbie.govt.nz/science-and-technology/science-and-innovation/research-and-data/nris/
+  EchoStringPost200ApplicationJsonResponse:
+    type: string
+    example: echo123
+  CodesetArray:
+    type: array
+    description: Related available codesets
+    items:
+      $ref: '#/definitions/Codeset'
+  ProtectionPatternArray:
+    type: array
+    description: All currently available Protection Patterns
+    items:
+      $ref: '#/definitions/ProtectionPattern'
+  RecordSuppressionArray:
+    type: array
+    description: All currently suppressed records for data provider
+    items:
+      $ref: '#/definitions/RecordSuppression'
+tags:
+  - name: dataprovider
+    description: Data Provider current registration
+    externalDocs:
+      url: 'http://nzris.org.nz/provider-api/overview/'
+      description: Find out more at
+  - name: submission
+    description: >-
+      Submission Bulk Operations for creating a new submission or accessing the
+      entire submission collection
+    externalDocs:
+      url: 'http://nzris.org.nz/provider-api/overview/'
+      description: Find out more TBC
+  - name: element
+    description: Operations for accessing individual elements inside a submission
+    externalDocs:
+      url: 'http://nzris.org.nz/provider-api/overview/'
+      description: Find out more TBC
+  - name: reference
+    description: Operations for accessing reference data
+    externalDocs:
+      url: 'http://nzris.org.nz/provider-api/overview/'
+      description: Find out more TBC
+  - name: suppression
+    description: Operations for accessing records suppressed due to user feedback
+    externalDocs:
+      url: 'http://nzris.org.nz/provider-api/overview/'
+      description: Find out more TBC
