@@ -1,11 +1,10 @@
-{
-  "dataProviderId": "MBIE",
+﻿{
   "localSubmissionId": "string",
   "localResubmissionId": "string",
   "nzrisSubmissionId": "string",
   "dataSubmissionContacts": "Joe.Bloggs@RSI.ac.nz",
-  "dataStartDate": "2019-12-17",
-  "dataEndDate": "2019-12-17",
+  "dataStartDate": "2020-06-30",
+  "dataEndDate": "2020-06-30",
   "coverageIncluded": "string",
   "coverageExcluded": "string",
   "accuracyQuality": "includes GST, start date and end date are calculated.",
@@ -115,7 +114,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -158,8 +157,8 @@
             "resourceMeasureCurrency": "1",
             "resourceMeasureNonCurrency": "1",
             "resourceValue": "200000.00",
-            "startDate": "2019-12-17",
-            "endDate": "2019-12-17"
+            "startDate": "2020-06-30",
+            "endDate": "2020-06-30"
           }
         ],
         "proposal": [
@@ -219,8 +218,8 @@
         "dataOwnerID": "string",
         "localApplicationID": "string",
         "localReviewID": "string",
-        "assignmentDate": "2019-12-17",
-        "reviewDate": "2019-12-17",
+        "assignmentDate": "2020-06-30",
+        "reviewDate": "2020-06-30",
         "priorLocalReviewID": "string",
         "reviewMethod": "1",
         "reviewScore": "3",
@@ -244,7 +243,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -270,7 +269,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -287,8 +286,8 @@
         "parentLocalContractID": "string",
         "awardTitle": "string",
         "awardDescription": "string",
-        "awardStartDate": "2019-12-17",
-        "awardEndDate": "2019-12-17",
+        "awardStartDate": "2020-06-30",
+        "awardEndDate": "2020-06-30",
         "awardStatus": "string",
         "awardType": "string",
         "assetPoolRecipientIDType": "1",
@@ -319,8 +318,8 @@
             "resourceMeasureCurrency": "1",
             "resourceMeasureNonCurrency": "1",
             "resourceValue": "200000.00",
-            "startDate": "2019-12-17",
-            "endDate": "2019-12-17",
+            "startDate": "2020-06-30",
+            "endDate": "2020-06-30",
             "constraints": [
               {
                 "constraintType": "01",
@@ -366,7 +365,7 @@
             "themePriorityOrProgrammeNSC": "100",
             "themePriorityOrProgrammeHRC": "100",
             "themePriorityOrProgrammeMPI": "100",
-            "themePriorityOrProgrammeVisionMatauranga": "100",
+            "themePriorityOrProgrammeVisionMātauranga": "100",
             "shareOfTheme": "1"
           }
         ],
@@ -374,7 +373,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -399,13 +398,13 @@
         "resourceMeasureNonCurrency": "1",
         "resourceValue": "4000000.00",
         "distributionBasis": "1",
-        "distributionStartDate": "2019-12-17",
-        "distributionEndDate": "2019-12-17",
+        "distributionStartDate": "2020-06-30",
+        "distributionEndDate": "2020-06-30",
         "protectionRequirements": [
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -420,8 +419,8 @@
         "keywords": [
           "string"
         ],
-        "projectStartDate": "2019-12-17",
-        "projectEndDate": "2019-12-17",
+        "projectStartDate": "2020-06-30",
+        "projectEndDate": "2020-06-30",
         "projectStatus": "1",
         "benefitingRegions": [
           "01",
@@ -459,7 +458,7 @@
             "themePriorityOrProgrammeNSC": "100",
             "themePriorityOrProgrammeHRC": "100",
             "themePriorityOrProgrammeMPI": "100",
-            "themePriorityOrProgrammeVisionMatauranga": "100",
+            "themePriorityOrProgrammeVisionMātauranga": "100",
             "shareOfTheme": "1"
           }
         ],
@@ -468,8 +467,8 @@
             "personIDType": "2",
             "personID": "https://orcid.org/0000-0001-1111-1111",
             "personnelRole": "R1",
-            "startDate": "2019-12-17",
-            "endDate": "2019-12-17",
+            "startDate": "2020-06-30",
+            "endDate": "2020-06-30",
             "FTEAllocation": "0.2",
             "localRoleDescription": "Lead Researcher"
           }
@@ -478,7 +477,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -497,8 +496,8 @@
         "awardTitle": "Endeavour Fund Asset Pool award to Research Programmes Asset Pool",
         "awardDescription": "string",
         "subjectToOpenContestability": "Yes",
-        "awardStartDate": "2019-12-17",
-        "awardEndDate": "2019-12-17",
+        "awardStartDate": "2020-06-30",
+        "awardEndDate": "2020-06-30",
         "awardStatus": "1",
         "awardType": "1",
         "organisations": [
@@ -525,8 +524,8 @@
             "resourceMeasureCurrency": "1",
             "resourceMeasureNonCurrency": "1",
             "resourceValue": "200000.00",
-            "startDate": "2019-12-17",
-            "endDate": "2019-12-17",
+            "startDate": "2020-06-30",
+            "endDate": "2020-06-30",
             "constraints": [
               {
                 "constraintType": "01",
@@ -551,7 +550,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ],
         "AssetPoolRecipientIDType": "1",
@@ -580,13 +579,13 @@
         "resourceMeasureNonCurrency": "1",
         "resourceValue": "200000.00",
         "distributionBasis": "1",
-        "distributionStartDate": "2019-12-17",
-        "distributionEndDate": "2019-12-17",
+        "distributionStartDate": "2020-06-30",
+        "distributionEndDate": "2020-06-30",
         "protectionRequirements": [
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -600,7 +599,7 @@
         "localOutputType": "Peer Review Research Journal Article",
         "outputTitle": "string",
         "accessType": "O",
-        "productionDate": "2019-12-17",
+        "productionDate": "2020-06-30",
         "outputDescription": "string",
         "localProjectIDs": [
           "string"
@@ -621,7 +620,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -635,7 +634,7 @@
           "string"
         ],
         "familyName": "string",
-        "dateOfBirth": "2019-12-17",
+        "dateOfBirth": "2020-06-30",
         "gender": "string",
         "priorLocalPersonID": "string",
         "genderOtherInformation": "string",
@@ -660,7 +659,7 @@
         "academicRecord": [
           {
             "academicQualification": "10",
-            "dateConferred": "2019-12-17",
+            "dateConferred": "2020-06-30",
             "discipline": "010101",
             "awardingInstitution": "string",
             "researchTopic": "string",
@@ -694,7 +693,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -707,8 +706,8 @@
         "priorLocalOrganisationID": "string",
         "parentOrganisationIDType": "2",
         "parentOrganisationID": "9429041920244",
-        "dateOfEstablishment": "2019-12-17",
-        "dateOfDisestablishment": "2019-12-17",
+        "dateOfEstablishment": "2020-06-30",
+        "dateOfDisestablishment": "2020-06-30",
         "organisationIdentifiers": [
           {
             "organisationExternalIDType": "2",
@@ -726,8 +725,8 @@
           {
             "organisationNameType": "1",
             "organisationNameValue": "string",
-            "organisationNameStartDate": "2019-12-17",
-            "organisationNameEndDate": "2019-12-17",
+            "organisationNameStartDate": "2020-06-30",
+            "organisationNameEndDate": "2020-06-30",
             "organisationNameComment": "string"
           }
         ],
@@ -735,7 +734,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
@@ -749,8 +748,8 @@
           {
             "groupNameType": "1",
             "groupNameValue": "string",
-            "nameStartDate": "2019-12-17",
-            "nameEndDate": "2019-12-17",
+            "nameStartDate": "2020-06-30",
+            "nameEndDate": "2020-06-30",
             "groupNameComment": "string"
           }
         ],
@@ -764,7 +763,7 @@
           {
             "pattern": "string",
             "ProtectionExpiration": "string",
-            "datePatternExpires": "2019-12-17"
+            "datePatternExpires": "2020-06-30"
           }
         ]
       }
